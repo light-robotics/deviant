@@ -5,12 +5,15 @@ DEBUG = False # in DEBUG mode command to servos is not issued
 
 project_dir = os.path.join(os.path.dirname(__file__), '..')
 main_log_file = os.path.join(project_dir, 'logs', 'main.log')
-current_sensor_log_file = os.path.join(project_dir, 'logs', 'current_sensor.log')
+lidar_log_file = os.path.join(project_dir, 'logs', 'lidar.log')
+lidar_data_log_file = os.path.join(project_dir, 'logs', 'lidar_data.log')
 pathfinding_log_file = os.path.join(project_dir, 'logs', 'pathfinding.log')
 angles_log_file = os.path.join(project_dir, 'logs', 'angles.log')
 
 movement_command_file = os.path.join(project_dir, 'wrk', 'movement_command.txt')
 neopixel_command_file = os.path.join(project_dir, 'wrk', 'neopixel_command.txt')
+
+lidar_data_file = os.path.join(project_dir, 'data', 'lidar_data.log')
 
 cache_dir = os.path.join(project_dir, 'cache')
 
@@ -27,10 +30,15 @@ logger_config = {
             'formatter': 'default_formatter',
             'filename': main_log_file
         },
-        'current_sensor_file_handler': {
+        'lidar_file_handler': {
             'class': 'logging.FileHandler',
             'formatter': 'default_formatter',
-            'filename': current_sensor_log_file
+            'filename': lidar_log_file
+        },
+        'lidar_data_file_handler': {
+            'class': 'logging.FileHandler',
+            'formatter': 'default_formatter',
+            'filename': lidar_data_log_file
         },
         'pathfinding_file_handler': {
             'class': 'logging.FileHandler',
@@ -49,8 +57,13 @@ logger_config = {
             'level': 'DEBUG',
             'propagate': True
         },
-        'current_sensor_logger': {
-            'handlers': ['current_sensor_file_handler'],
+        'lidar_logger': {
+            'handlers': ['lidar_file_handler'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'lidar_data_logger': {
+            'handlers': ['lidar_data_file_handler'],
             'level': 'DEBUG',
             'propagate': True
         },
