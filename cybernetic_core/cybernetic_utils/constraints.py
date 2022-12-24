@@ -1,5 +1,5 @@
 from typing import Optional, Dict
-from configs import config as cfg
+from configs import kinematics_config as cfg
 import configs.code_config as code_config
 import logging.config
 
@@ -9,8 +9,7 @@ def rule_followed(constraint: Dict, value: float) -> bool:
         return False
     return True
 
-def leg_angles_correct(    
-    leg_type: str,
+def leg_angles_correct(
     alpha: Optional[float] = None, 
     beta: Optional[float] = None, 
     gamma: Optional[float] = None, 
@@ -18,13 +17,13 @@ def leg_angles_correct(
     logger = None
     ) -> bool:
     
-    logger.info(f'Trying angles {[alpha, beta, gamma, tetta]}, leg type : {leg_type}')
+    logger.info(f'Trying angles {[alpha, beta, gamma, tetta]}')
 
     if tetta is None and alpha is None and beta is None and gamma is None:
         logger.info('All angles provided are None')
         raise Exception('All angles provided are None')
     
-    leg_constraints = cfg.angles[leg_type]
+    leg_constraints = cfg.angles
     if tetta is not None:
         if not rule_followed(leg_constraints["tetta"], tetta):
             logger.info(f'Bad tetta : {tetta}')
@@ -42,10 +41,7 @@ def leg_angles_correct(
         if not rule_followed(leg_constraints["gamma"], gamma):
             logger.info(f'Bad gamma : {gamma}')
             return False
-        
-        if not rule_followed(leg_constraints["beta-gamma"], beta-gamma):
-            logger.info(f'Bad beta-gamma : {beta-gamma}')
-            return False
+
 
     logger.info(f'Good angles : {alpha}, {beta}, {gamma}, {tetta}')
     return True

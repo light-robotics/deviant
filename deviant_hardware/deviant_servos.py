@@ -1,6 +1,9 @@
 import time
 import sys
 import os
+from dataclasses import dataclass
+from typing import Dict
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from hardware.lx16a import LX16A, read_values
 import logging
@@ -8,6 +11,42 @@ import configs.config as config
 import configs.code_config as code_config
 import logging.config
 logging.config.dictConfig(code_config.logger_config)
+
+
+@dataclass
+class DeviantLeg:
+    alpha_servo_id: int
+    beta_servo_id: int
+    gamma_servo_id: int
+    delta_servo_id: int
+    tetta_servo_id: int
+
+
+def convert_kinematic_angles_to_ids(angles: Dict[str, Dict[str, float]]) -> Dict[id, float]:
+    angles_to_ids_values = {
+        2  : angles["leg1"].get("delta", 0),
+        3  : angles["leg1"]["gamma"],
+        4  : angles["leg1"]["beta"],
+        5  : angles["leg1"]["alpha"],
+        6  : angles["leg1"]["tetta"],
+        8  : angles["leg2"].get("delta", 0),
+        9  : angles["leg2"]["gamma"],
+        10 : angles["leg2"]["beta"],
+        11 : angles["leg2"]["alpha"],
+        12 : angles["leg2"]["tetta"],
+        14 : angles["leg3"].get("delta", 0),
+        15 : angles["leg3"]["gamma"],
+        16 : angles["leg3"]["beta"],
+        17 : angles["leg3"]["alpha"],
+        18 : angles["leg3"]["tetta"],
+        20 : angles["leg4"].get("delta", 0),
+        21 : angles["leg4"]["gamma"],
+        22 : angles["leg4"]["beta"],
+        23 : angles["leg4"]["alpha"],
+        24 : angles["leg4"]["tetta"],
+    }
+
+    return angles_to_ids_values
 
 
 class DeviantServos:
@@ -28,11 +67,40 @@ class DeviantServos:
         # 0.18 sec / 60 degrees for 6V+
         # my max speed is for 45 degrees
         # that means that max speed should be 120 for 7.4V+ and 135 for 6V+
+        self.servo_ids = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24]
+        self.motor_ids = [1, 7, 13, 19]
+        self.angles_mapping = {
+            "leg1": DeviantLeg(5, 4, 3, 2, 6),
+            "leg2": DeviantLeg(11, 10, 9, 8, 12),
+            "leg3": DeviantLeg(17, 16, 15, 14, 18),
+            "leg4": DeviantLeg(23, 22, 21, 20, 24),
+        }
+
+    def get_board_by_id(self, id: int) -> LX16A:
+        if 1 <= id <= 6:
+            return self.m1
+        if 7 <= id <= 12:
+            return self.m2
+        if 13 <= id <= 18:
+            return self.m3
+        if 19 <= id <= 24:
+            return self.m4
+
+    def get_current_angles(self) -> Dict[int, float]:
+        current_angles = {}
+        for id in self.servo_ids:
+            current_angles[id] = self.get_board_by_id(id).read_angle(id)
+        return current_angles
+
+    def send_command_to_servos(self, angles, rate=1000):
+        angles_converted = convert_kinematic_angles_to_ids(angles)
+        for id in self.servo_ids:
+            self.get_board_by_id(id).move_servo_to_angle(id, angles_converted[id], rate)
 
     def print_status(self):
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:
-            for _ in range(4):
+            for _ in range(6):
                 m.read_values(j)
                 j += 1
     
@@ -41,27 +109,6 @@ class DeviantServos:
             raise Exception(f'Invalid speed value {new_speed}. Should be between {self.max_speed} and 10000')
         self.speed = new_speed
         self.logger.info(f'DeviantServos. Speed set to {self.speed}')
-    
-    #@timing
-    def get_current_angles(self):
-        current_angles = []
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:            
-            for _ in range(4):
-                current_angles.append(m.read_angle(j))
-                time.sleep(0.0002)
-                j += 1
-        self.logger.info(f'Read current angles : {current_angles}')
-        
-        return current_angles
-    
-    # return 4 angles from one board
-    def get_angles_from_board(self, board):
-        angles = []
-        start_numbers = {self.m1 : 1, self.m2 : 5, self.m3 : 9, self.m4 : 13}
-        for j in range(start_numbers[board], start_numbers[board] + 4):
-            angles.append(board.read_angle(j))
-        return angles
 
     def angles_are_close(self, target_angles):
         """
@@ -69,39 +116,13 @@ class DeviantServos:
         if they are different, return false
         """
         current_angles = self.get_current_angles()
-        """
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:            
-            for _ in range(4):
-                current_angles.append(m.readAngle(j))
-                j += 1
-        print('Current angles :')
-        print(current_angles)
-        """
+
         for i in range(16):
             if abs(current_angles[i] - target_angles[i]) > 2:
                 print('Angles {0} diff too big. {1}, {2}'.format(i, current_angles[i], target_angles[i]))
                 return False
 
         return True
-
-    def set_servo_values(self, angles, rate=0):
-        print('Sending values \n{0}'.format(angles))
-        #self.get_angles_diff(angles)
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:
-            for _ in range(4):
-                m.move_servo_to_angle(j, angles[j-1], rate)
-                j += 1
-    #@timing
-    def send_command_to_servos(self, angles, rate):
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:
-        #for m in [self.m1]: # WTF 4 -> 1
-            for _ in range(4): 
-                m.move_servo_to_angle(j, angles[j-1], rate)
-                time.sleep(0.0002)
-                j += 1
     
     def log_servo_data(self):
         j = 1
@@ -110,13 +131,6 @@ class DeviantServos:
                 self.logger.info(read_values(m, j))
                 time.sleep(0.0002)
                 j += 1
-    
-    # sends 4 angles to one board
-    def send_angles_to_board(self, board, angles, rate):
-        start_numbers = {self.m1 : 1, self.m2 : 5, self.m3 : 9, self.m4 : 13}
-        for j in range(start_numbers[board], start_numbers[board] + 4):
-            board.move_servo_to_angle(j, angles[j-1], rate)
-
 
     #@timing
     def set_servo_values_paced(self, angles):
@@ -296,18 +310,13 @@ class DeviantServos:
 
 
 if __name__ == '__main__':
-    fnx = DeviantServos()
+    dvnt = DeviantServos()
         
-    fnx.set_speed(500)
-    sequence = [[0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0]]
-    """
-    sequence = [[-8.02, 18.04, 95.45, -12.6, 8.02, 18.04, 95.45, -12.6, -8.02, 18.04, 95.45, -12.6, 8.02, 18.04, 95.45, -12.6], 
-    [-7.64, 0.19, 24.61, -63.58, 22.98, 14.27, 73.54, -30.73, -8.72, 16.57, 112.6, -6.97, -9.18, 18.54, 100.81, -7.73], 
-    [-7.64, 17.51, 22.76, -82.75, 22.98, 14.27, 73.54, -30.73, -8.72, 16.57, 112.6, -6.97, -9.18, 18.54, 100.81, -7.73],
-    [-7.64, 0.19, 24.61, -63.58, 22.98, 14.27, 73.54, -30.73, -8.72, 16.57, 112.6, -6.97, -9.18, 18.54, 100.81, -7.73],
-    [-8.02, 18.04, 95.45, -12.6, 8.02, 18.04, 95.45, -12.6, -8.02, 18.04, 95.45, -12.6, 8.02, 18.04, 95.45, -12.6]]
-    """
-    
-    for angles in sequence:     
-        fnx.set_servo_values_paced(angles)
+    dvnt.set_speed(3000)
+    angles = {'leg1': {'tetta': 0.0, 'alpha': -54.32, 'beta': 72.72, 'gamma': -83.71}, 'leg2': {'tetta': 0.0, 'alpha': -54.32, 'beta': 72.72, 'gamma': -83.71}, 'leg3': {'tetta': 0.0, 'alpha': -54.32, 'beta': 72.72, 'gamma': -83.71}, 'leg4': {'tetta': 0.0, 'alpha': -54.32, 'beta': 72.72, 'gamma': -83.71}}
+    dvnt.send_command_to_servos(angles, 3000)
+    #sequence = [[0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0]]
+        
+    #for angles in sequence:     
+    #    dvnt.set_servo_values_paced(angles)
     

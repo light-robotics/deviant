@@ -9,18 +9,18 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 from cybernetic_core.geometry.lines import Point
 from cybernetic_core.cybernetic_utils.constraints import leg_angles_correct
 
-import configs.config as cfg
+import configs.kinematics_config as cfg
 import configs.code_config as code_config
 import logging.config
 
 
 @lru_cache(maxsize=None)
-def get_leg_angles(delta_x, delta_z, leg_tag, logger):
-    possible_angles = find_angles(delta_x, delta_z, leg_tag, logger)
+def get_leg_angles(delta_x, delta_z, logger):
+    possible_angles = find_angles(delta_x, delta_z, logger)
 
     return get_best_angles(possible_angles)
 
-def find_angles(Dx, Dy, leg_tag, logger):
+def find_angles(Dx, Dy, logger):
     a, b, c = cfg.leg["a"], cfg.leg["b"], cfg.leg["c"]
     results = []
     full_dist = math.sqrt(Dx ** 2 + Dy ** 2)
@@ -65,7 +65,6 @@ def find_angles(Dx, Dy, leg_tag, logger):
                     # only one of two coeffs is correct
 
                 if leg_angles_correct(
-                    leg_type=leg_tag, 
                     alpha=math.degrees(alpha), 
                     beta=math.degrees(beta), 
                     gamma=math.degrees(gamma),
@@ -75,11 +74,10 @@ def find_angles(Dx, Dy, leg_tag, logger):
 
     return results
 
-def calculate_leg_angles(O: Point, D: Point, leg_tag: str, logger):
-    #logger.info(f'[CLA] O: {O}, D: {D}, {leg_tag}')
+def calculate_leg_angles(O: Point, D: Point, logger):
     tetta = math.atan2(D.y - O.y, D.x - O.x)
     #print(tetta, math.degrees(tetta))
-    if not leg_angles_correct(leg_type=leg_tag, tetta=tetta, logger=logger):
+    if not leg_angles_correct(tetta=tetta, logger=logger):
         logger.info(f'Bad tetta : {tetta}')
         raise Exception(f'Bad tetta : {tetta}')
 
@@ -90,7 +88,7 @@ def calculate_leg_angles(O: Point, D: Point, leg_tag: str, logger):
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
     logger.info(f'Trying l {l} and delta_z {delta_z}')
-    alpha, beta, gamma = get_leg_angles(l, delta_z, leg_tag, logger)
+    alpha, beta, gamma = get_leg_angles(l, delta_z, logger)
     
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}, {math.degrees(gamma)}')
 
@@ -133,11 +131,11 @@ def convert_gamma_back(gamma_converted: float) -> float:
     return gamma_initial
 
 def convert_alpha(alpha: float) -> float:
-    alpha_converted = round(math.degrees(alpha), 2)
+    alpha_converted = -round(math.degrees(alpha), 2)
     return alpha_converted
 
 def convert_alpha_back(alpha_converted: float) -> float:
-    alpha_initial = round(math.radians(alpha_converted), 4)
+    alpha_initial = -round(math.radians(alpha_converted), 4)
     return alpha_initial
 
 def convert_beta(beta: float) -> float:
@@ -154,13 +152,10 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
     if leg_number == 1:
         tetta_degrees -= 45
     elif leg_number == 2:
-        #tetta_degrees -= 135
         tetta_degrees += 45
     elif leg_number == 3:
         tetta_degrees += 135
-        #tetta_degrees -= 45
     elif leg_number == 4:
-        #tetta_degrees += 45
         tetta_degrees -= 135
     
     return round(tetta_degrees, 2)
@@ -168,45 +163,50 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
 def convert_tetta_back(tetta_degrees: float, leg_number: int) -> float:
     # real servos to virtual model    
     if leg_number == 1:
-        tetta_degrees += 45
-    elif leg_number == 2:
-        #tetta_degrees += 135
-        tetta_degrees -= 45
-    elif leg_number == 3:
-        tetta_degrees -= 135
-        #tetta_degrees += 45
-    elif leg_number == 4:
-        #tetta_degrees -= 45
         tetta_degrees += 135
+    elif leg_number == 2:
+        tetta_degrees += 45
+    elif leg_number == 3:
+        tetta_degrees -= 45
+    elif leg_number == 4:
+        tetta_degrees -= 135
     
     return round(math.radians(tetta_degrees), 4)
-    
+
 def convert_legs_angles(legs_angles: List[float]) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
-    # was gamma, beta, alpha, tetta one leg after another
-    # now tetta, alpha, beta, gamma one leg after another
-    angles_converted = [
-        convert_tetta(legs_angles[0], 1),
-        convert_alpha(legs_angles[1]),
-        convert_beta(legs_angles[2]),
-        convert_gamma(legs_angles[3]),
-        convert_tetta(legs_angles[4], 2),
-        convert_alpha(legs_angles[5]),
-        convert_beta(legs_angles[6]),
-        convert_gamma(legs_angles[7]),
-        convert_tetta(legs_angles[8], 3),
-        convert_alpha(legs_angles[9]),
-        convert_beta(legs_angles[10]),
-        convert_gamma(legs_angles[11]),
-        convert_tetta(legs_angles[12], 4),
-        convert_alpha(legs_angles[13]),
-        convert_beta(legs_angles[14]),
-        convert_gamma(legs_angles[15]),
-    ]
+    # input tetta, alpha, beta, gamma one leg after another
+    angles_converted = {
+        "leg1": {
+            "tetta": convert_tetta(legs_angles[0], 1),
+            "alpha": convert_alpha(legs_angles[1]),
+            "beta" : convert_beta(legs_angles[2]),
+            "gamma": convert_gamma(legs_angles[3]),
+        },
+        "leg2": {
+            "tetta": convert_tetta(legs_angles[4], 2),
+            "alpha": convert_alpha(legs_angles[5]),
+            "beta" : convert_beta(legs_angles[6]),
+            "gamma": convert_gamma(legs_angles[7]),
+        },
+        "leg3": {
+            "tetta": convert_tetta(legs_angles[8], 3),
+            "alpha": convert_alpha(legs_angles[9]),
+            "beta" : convert_beta(legs_angles[10]),
+            "gamma": convert_gamma(legs_angles[11]),
+        },
+        "leg4": {
+            "tetta": convert_tetta(legs_angles[12], 4),
+            "alpha": convert_alpha(legs_angles[13]),
+            "beta" : convert_beta(legs_angles[14]),
+            "gamma": convert_gamma(legs_angles[15]),
+        },
+    }
 
     return angles_converted
 
+# TODO: REDO THAT
 def convert_legs_angles_back(legs_angles_converted: List[float]) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
@@ -234,24 +234,7 @@ def convert_legs_angles_back(legs_angles_converted: List[float]) -> List[float]:
     return angles_initial
 
 def get_best_angles(all_angles):
-    min_distance = 100000
-    best_angles = None
-    min_distance_num = 0
-
-    for item in all_angles:
-        #if not check_angles(item):
-        #    continue
-        cur_distance = get_angles_distance(item)
-        #print([math.degrees(x) for x in item], cur_distance, min_distance)
-        if cur_distance <= min_distance:
-            min_distance = cur_distance
-            best_angles = item[:]
-
-    if min_distance > 0.1:
-        min_distance_num += 1
-        if min_distance_num > 1:
-            # print('best_angles : {0}'.format([math.degrees(x) for x in best_angles]))
-            raise Exception('Min distance found : {0}'.format(min_distance))
+    best_angles = min(all_angles, key=get_angles_distance)
 
     if best_angles is None:        
         raise Exception('No angles')
@@ -312,8 +295,7 @@ if __name__ == '__main__':
     # [2022-03-09 23:22:21,571][INFO] Trying l 3.46 and delta_z -14.22
     O = Point(x=3.8, y=-3.8, z=0)
     D = Point(x=7.24, y=-3.69, z=-14.22)
-    leg_tag = 'rear_leg'
-    calculate_leg_angles(O, D, leg_tag, logger)
+    calculate_leg_angles(O, D, logger)
 
     # D initial : Point(x=7.24, y=-3.69, z=-14.22)
     # D calcula : Point(x=14.15, y=-3.47, z=-14.22)
