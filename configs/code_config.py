@@ -1,7 +1,7 @@
 import os
 
 
-DEBUG = False # in DEBUG mode command to servos is not issued
+DEBUG = True # in DEBUG mode command to servos is not issued
 
 project_dir = os.path.join(os.path.dirname(__file__), '..')
 main_log_file = os.path.join(project_dir, 'logs', 'main.log')
@@ -10,8 +10,8 @@ lidar_data_log_file = os.path.join(project_dir, 'logs', 'lidar_data.log')
 pathfinding_log_file = os.path.join(project_dir, 'logs', 'pathfinding.log')
 angles_log_file = os.path.join(project_dir, 'logs', 'angles.log')
 
-movement_command_file = os.path.join(project_dir, 'wrk', 'movement_command.txt')
-neopixel_command_file = os.path.join(project_dir, 'wrk', 'neopixel_command.txt')
+movement_command_file = os.path.join(project_dir, 'commands', 'movement_command.txt')
+neopixel_command_file = os.path.join(project_dir, 'commands', 'neopixel_command.txt')
 
 lidar_data_file = os.path.join(project_dir, 'data', 'lidar_data.log')
 
