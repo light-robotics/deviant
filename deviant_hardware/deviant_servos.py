@@ -138,6 +138,13 @@ class DeviantServos:
             for id in self.motor_ids:
                 self.get_board_by_id(id).motor_or_servo(id, 1, 0)
 
+    def process_motors_command(self, command, speed):
+        if command in ('forward', 'backwards'):
+            self.wheels_direction = WheelsDirection.FORWARD
+        if command == 'backwards':
+            speed = -speed
+        self.send_command_to_motors(speed)
+
     def print_status(self):
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:

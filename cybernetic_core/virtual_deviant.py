@@ -16,76 +16,74 @@ SIDE_LOOK_ANGLE = cfg.moves["side_look_angle"]
 VERTICAL_LOOK_ANGLE = cfg.moves["vertical_look_angle"]
 
 
-class VirtualDeviant():
+class VirtualDeviant(DeviantKinematics):
     """
     Class to separate getting sequences for commands from actual kinematics calculations
     """
-    def __init__(self, logger):
-        self.logger = logger
-        self.dk = DeviantKinematics()
+    def __init__(self):
+        super().__init__()
 
-    def get_sequence(self, command: str):
-        dk = self.dk    
+    def get_sequence(self, command: str):        
         if command == 'forward_1':
             # Legs 1 and 3 moved x1
-            dk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
+            self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_2':
             # Legs 2 and 4 moved x2
-            dk.move_2_legs_phased_24(0, 2 * FORWARD_LEGS_2LEG_CM)
+            self.move_2_legs_phased_24(0, 2 * FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_22':
             # Legs 2 and 4 moved x1
-            dk.move_2_legs_phased_24(0, FORWARD_LEGS_2LEG_CM)
+            self.move_2_legs_phased_24(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_3':
             # Legs 1 and 3 moved x2
-            dk.move_2_legs_phased_13(0, 2 * FORWARD_LEGS_2LEG_CM)
+            self.move_2_legs_phased_13(0, 2 * FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_32':
             # Legs 1 and 3 moved x1
-            dk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
+            self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_one_legged':
-            dk.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
+            self.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
         elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
-            dk.switch_mode(command)
+            self.switch_mode(command)
         elif command == 'body_forward':
-            if dk.body_delta_xy()[1] > cfg.limits["body_forward"]:
+            if self.body_delta_xy()[1] > cfg.limits["body_forward"]:
                 print('Forward body limit reached')
             else:
-                dk.body_movement(0, FORWARD_BODY_CM, 0)
+                self.body_movement(0, FORWARD_BODY_CM, 0)
         elif command == 'body_backward':
-            if dk.body_delta_xy()[1] < -cfg.limits["body_forward"]:
+            if self.body_delta_xy()[1] < -cfg.limits["body_forward"]:
                 print('Backward body limit reached')
             else:
-                dk.body_movement(0, -FORWARD_BODY_CM, 0)
+                self.body_movement(0, -FORWARD_BODY_CM, 0)
         elif command == 'body_left':
-            if dk.body_delta_xy()[0] < -cfg.limits["body_sideways"]:
+            if self.body_delta_xy()[0] < -cfg.limits["body_sideways"]:
                 print('Body left limit reached')
             else:
-                dk.body_movement(-FORWARD_BODY_CM, 0, 0)
+                self.body_movement(-FORWARD_BODY_CM, 0, 0)
         elif command == 'body_right':
-            if dk.body_delta_xy()[0] > cfg.limits["body_sideways"]:
+            if self.body_delta_xy()[0] > cfg.limits["body_sideways"]:
                 print('Body right limit reached')
             else:
-                dk.body_movement(FORWARD_BODY_CM, 0, 0)
+                self.body_movement(FORWARD_BODY_CM, 0, 0)
         elif command == 'body_to_center':
-            dk.body_to_center()
+            self.body_to_center()
         elif command == 'up':
-            dk.body_movement(0, 0, UP_OR_DOWN_CM)
+            self.body_movement(0, 0, UP_OR_DOWN_CM)
         elif command == 'down':
-            dk.body_movement(0, 0, -UP_OR_DOWN_CM)
+            self.body_movement(0, 0, -UP_OR_DOWN_CM)
         elif command == 'reposition_x_up':
-            dk.reposition_legs(REPOSITION_CM, 0)
+            self.reposition_legs(REPOSITION_CM, 0)
         elif command == 'reposition_x_down':
-            dk.reposition_legs(-REPOSITION_CM, 0)
+            self.reposition_legs(-REPOSITION_CM, 0)
         elif command == 'reposition_y_up':
-            dk.reposition_legs(0, REPOSITION_CM)
+            self.reposition_legs(0, REPOSITION_CM)
         elif command == 'reposition_y_down':
-            dk.reposition_legs(0, -REPOSITION_CM)
+            self.reposition_legs(0, -REPOSITION_CM)
         elif command == 'start':
-            dk.start()
+            self.start()
         elif command == 'end':
-            dk.end()
+            self.end()
         elif command == 'reset':
-            dk.reset()
+            self.reset()
         else:
             print(f'Unknown command')
         
-        return dk.sequence
+        return self.sequence

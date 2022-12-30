@@ -57,6 +57,12 @@ class DeviantKinematics:
 
     def reset_history(self):
         self.angles_history = []
+    
+    def save_state(self):
+        self.legs_backup = copy.deepcopy(self.legs)
+
+    def load_state(self):
+        self.legs = self.legs_backup
 
     def add_angles_snapshot(self, move_type: str = 'unknown'):
         angles = {
@@ -280,7 +286,7 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoint')
 
     # 1-legged movements
-    def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
+    def move_body_straight(self, delta_x, delta_y, leg_seq=[2, 4, 1, 3]):
         for leg_number in leg_seq:
             self.logger.info(f'Processing leg {leg_number} with compensation')
             self.leg_move_with_compensation(leg_number, delta_x, delta_y)
