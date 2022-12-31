@@ -15,11 +15,11 @@ angles = {
         "ideal": 0,
     },
     "alpha": {
-        "min": -60,
-        "max": 55,
+        "min": -40,
+        "max": 73,
     },
     "beta": {
-        "min": -90,
+        "min": -110,
         "max": 0,
     },
     "gamma": {
@@ -37,9 +37,9 @@ angles = {
 }
 
 start = {
-    "vertical"                 : 15,
-    "horizontal_x"             : 11,
-    "horizontal_y"             : 11,
+    "vertical"                 : 20,
+    "horizontal_x"             : 13,
+    "horizontal_y"             : 13,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }

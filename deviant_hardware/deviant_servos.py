@@ -130,8 +130,10 @@ class DeviantServos:
             self.get_board_by_id(id).move_servo_to_angle(id, angles_converted[id], rate)
 
     def send_command_to_motors(self, speed: int = 1000, duration: int = 0):
-        for id in self.motor_ids:
-            self.get_board_by_id(id).motor_or_servo(id, 1, speed)
+        self.get_board_by_id(1).motor_or_servo(1, 1, speed)
+        self.get_board_by_id(7).motor_or_servo(7, 1, -speed)
+        self.get_board_by_id(13).motor_or_servo(13, 1, -speed)
+        self.get_board_by_id(19).motor_or_servo(19, 1, speed)
         assert duration < 10
         if duration > 0:
             time.sleep(duration)
@@ -353,9 +355,10 @@ class DeviantServos:
 if __name__ == '__main__':
     dvnt = DeviantServos()
         
+    """
     dvnt.set_speed(3000)
     dvnt.wheels_direction = WheelsDirection.WALK
-    dvnt.send_command_to_motors(1000)
+    dvnt.send_command_to_motors(-1000)
     angles = {'leg1': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg2': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg3': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg4': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}}
     dvnt.send_command_to_servos(angles, 2000)
     time.sleep(3)
@@ -366,6 +369,21 @@ if __name__ == '__main__':
     dvnt.send_command_to_servos(angles, 2000)
     time.sleep(3)
     dvnt.send_command_to_motors(0)
+    """
+    dvnt.wheels_direction = WheelsDirection.FORWARD
+    # 10-13-13
+    #angles = {'leg1': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}, 'leg2': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}, 'leg3': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}, 'leg4': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}}
+    # 20-10-10
+    #angles = {'leg1': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}, 'leg2': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}, 'leg3': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}, 'leg4': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}}
+    # 20-13-13
+    angles = {'leg1': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}, 'leg2': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}, 'leg3': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}, 'leg4': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}}
+    dvnt.send_command_to_servos(angles, 2000)
+    
+    time.sleep(3)
+    dvnt.send_command_to_motors(1000)
+    time.sleep(2)
+    dvnt.send_command_to_motors(0)
+
     #dvnt.send_command_to_motors(1000)
     #time.sleep(3)
     #dvnt.send_command_to_motors(0)
