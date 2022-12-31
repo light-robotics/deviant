@@ -173,38 +173,26 @@ def convert_tetta_back(tetta_degrees: float, leg_number: int) -> float:
     
     return round(math.radians(tetta_degrees), 4)
 
+# TODO: make a converted dispatcher
 def convert_legs_angles(legs_angles: List[float]) -> List[float]:
-    # input: 16 angles in RADIANS
-    # output: 16 converted angles in DEGREES
-    # input tetta, alpha, beta, gamma one leg after another
-    angles_converted = {
-        "leg1": {
-            "tetta": convert_tetta(legs_angles[0], 1),
-            "alpha": convert_alpha(legs_angles[1]),
-            "beta" : convert_beta(legs_angles[2]),
-            "gamma": convert_gamma(legs_angles[3]),
-        },
-        "leg2": {
-            "tetta": convert_tetta(legs_angles[4], 2),
-            "alpha": convert_alpha(legs_angles[5]),
-            "beta" : convert_beta(legs_angles[6]),
-            "gamma": convert_gamma(legs_angles[7]),
-        },
-        "leg3": {
-            "tetta": convert_tetta(legs_angles[8], 3),
-            "alpha": convert_alpha(legs_angles[9]),
-            "beta" : convert_beta(legs_angles[10]),
-            "gamma": convert_gamma(legs_angles[11]),
-        },
-        "leg4": {
-            "tetta": convert_tetta(legs_angles[12], 4),
-            "alpha": convert_alpha(legs_angles[13]),
-            "beta" : convert_beta(legs_angles[14]),
-            "gamma": convert_gamma(legs_angles[15]),
-        },
+    return {
+        "leg1_tetta": convert_tetta(legs_angles["leg1_tetta"], 1),
+        "leg1_alpha": convert_alpha(legs_angles["leg1_alpha"]),
+        "leg1_beta" : convert_beta(legs_angles["leg1_beta"]),
+        "leg1_gamma": convert_gamma(legs_angles["leg1_gamma"]),
+        "leg2_tetta": convert_tetta(legs_angles["leg2_tetta"], 2),
+        "leg2_alpha": convert_alpha(legs_angles["leg2_alpha"]),
+        "leg2_beta" : convert_beta(legs_angles["leg2_beta"]),
+        "leg2_gamma": convert_gamma(legs_angles["leg2_gamma"]),
+        "leg3_tetta": convert_tetta(legs_angles["leg3_tetta"], 3),
+        "leg3_alpha": convert_alpha(legs_angles["leg3_alpha"]),
+        "leg3_beta" : convert_beta(legs_angles["leg3_beta"]),
+        "leg3_gamma": convert_gamma(legs_angles["leg3_gamma"]),
+        "leg4_tetta": convert_tetta(legs_angles["leg4_tetta"], 4),
+        "leg4_alpha": convert_alpha(legs_angles["leg4_alpha"]),
+        "leg4_beta" : convert_beta(legs_angles["leg4_beta"]),
+        "leg4_gamma": convert_gamma(legs_angles["leg4_gamma"]),
     }
-
-    return angles_converted
 
 # TODO: REDO THAT
 def convert_legs_angles_back(legs_angles_converted: List[float]) -> List[float]:

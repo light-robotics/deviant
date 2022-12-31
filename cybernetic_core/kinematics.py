@@ -36,31 +36,14 @@ class Leg:
         self.update_angles()
 
 class DeviantKinematics:
-    """
-    Either take initial position from config
-    or provide horizontal x, y and vertical v
-    or provide exact angles to create a kinematic model
-    """
-    def __init__(self, initial_position: Dict[str, int] = None, deviant_position: List[int] = None):
+    def __init__(self):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('main_logger')
-        
-        if initial_position is not None:
-            self.legs_offset_v = initial_position['vertical']
-            self.legs_offset_h_x = initial_position['horizontal_x']
-            self.legs_offset_h_y = initial_position['horizontal_y']
-            self.legs = self.initiate_legs()
-        elif deviant_position is None:
-            self.legs_offset_v = k_cfg.start['vertical']
-            self.legs_offset_h_x = k_cfg.start['horizontal_x']
-            self.legs_offset_h_y = k_cfg.start['horizontal_y']
-            self.legs = self.initiate_legs()
-        else:
-            self.legs = self.build_legs_from_angles(deviant_position)
-            # only correct when all leg's D's are equidistant from center
-            self.legs_offset_v = self.legs[1].O.z - self.legs[1].D.z
-            self.legs_offset_h_x = round((self.legs[1].D.x - self.legs[4].D.x)/2.0, 2)
-            self.legs_offset_h_y = round((self.legs[1].D.y - self.legs[2].D.y)/2.0, 2)
+
+        self.legs_offset_v = k_cfg.start['vertical']
+        self.legs_offset_h_x = k_cfg.start['horizontal_x']
+        self.legs_offset_h_y = k_cfg.start['horizontal_y']
+        self.legs = self.initiate_legs()
             
         print(f"""
             Kinematics created with 
@@ -68,48 +51,40 @@ class DeviantKinematics:
             h_x = {self.legs_offset_h_x},
             h_y = {self.legs_offset_h_y}
             """)
-
-        self.current_legs_offset_v = self.legs_offset_v
-        self.current_legs_offset_h_x = self.legs_offset_h_x
-        self.current_legs_offset_h_y = self.legs_offset_h_y
-
-        self.legs_deltas = {1 : [0, 0, 0], 2 : [0, 0, 0], 3 : [0, 0, 0], 4 : [0, 0, 0]}
-
-        self.current_angle = 0 # up/down
-        self.side_look_angle = 0 # left/right
-        self.current_vertical_angle = 0
-        self.current_horizontal_angle = 0
-        self.current_body_delta = [0, 0, 0]
-        self.margin = k_cfg.margin[1]
-        self.leg_up = k_cfg.leg_up[2]
-        self.leg_up_single = k_cfg.leg_up[1]
         
         self.angles_history = []
-        self.D_points_history = []
         self.add_angles_snapshot('init')
 
     def reset_history(self):
         self.angles_history = []
+    
+    def save_state(self):
+        self.legs_backup = copy.deepcopy(self.legs)
+
+    def load_state(self):
+        self.legs = self.legs_backup
 
     def add_angles_snapshot(self, move_type: str = 'unknown'):
-        angles_in = [
-                        self.legs[1].tetta, self.legs[1].alpha, self.legs[1].beta, self.legs[1].gamma,   
-                        self.legs[2].tetta, self.legs[2].alpha, self.legs[2].beta, self.legs[2].gamma,
-                        self.legs[3].tetta, self.legs[3].alpha, self.legs[3].beta, self.legs[3].gamma,
-                        self.legs[4].tetta, self.legs[4].alpha, self.legs[4].beta, self.legs[4].gamma,
-                    ]
+        angles = {
+            "leg1_alpha": self.legs[1].alpha,
+            "leg1_beta": self.legs[1].beta,
+            "leg1_gamma": self.legs[1].gamma,
+            "leg1_tetta": self.legs[1].tetta,
+            "leg2_alpha": self.legs[2].alpha,
+            "leg2_beta": self.legs[2].beta,
+            "leg2_gamma": self.legs[2].gamma,
+            "leg2_tetta": self.legs[2].tetta,
+            "leg3_alpha": self.legs[3].alpha,
+            "leg3_beta": self.legs[3].beta,
+            "leg3_gamma": self.legs[3].gamma,
+            "leg3_tetta": self.legs[3].tetta,
+            "leg4_alpha": self.legs[4].alpha,
+            "leg4_beta": self.legs[4].beta,
+            "leg4_gamma": self.legs[4].gamma,
+            "leg4_tetta": self.legs[4].tetta,
+        }
 
-        #new_move = MoveSnapshot(move_type, convert_legs_angles(angles_in))
-        new_move = MoveSnapshot(move_type, angles_in)
-        self.angles_history.append(new_move)
-        
-        self.D_points_history.append(
-            [
-                copy.deepcopy(self.legs[1].D),
-                copy.deepcopy(self.legs[2].D),
-                copy.deepcopy(self.legs[3].D),
-                copy.deepcopy(self.legs[4].D)
-            ])
+        self.angles_history.append(MoveSnapshot(move_type, angles))
 
     @property
     def sequence(self):
@@ -117,11 +92,9 @@ class DeviantKinematics:
         for move in self.angles_history:
             sequence.append(MoveSnapshot(move.move_type, convert_legs_angles(move.angles_snapshot)))
         return sequence
-        #return self.angles_history
     
     @property
     def current_position(self):
-        #return convert_legs_angles_back(self.sequence[-1].angles_snapshot)
         return self.angles_history[-1].angles_snapshot
 
     def initiate_legs(self):
@@ -164,48 +137,6 @@ class DeviantKinematics:
         self.logger.info('[Init] Initialization successful')
 
         return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
-    
-    def build_legs_from_angles(self, deviant_position: List[int]):
-        O1 = Point(k_cfg.leg["mount_point_offset"],
-                   k_cfg.leg["mount_point_offset"],
-                   0)
-        tetta1, alpha1, beta1, gamma1 = deviant_position[0:4]
-        #print(f'Leg1 : {[round(math.degrees(x), 2) for x in [tetta1, alpha1, beta1, gamma1]]}')
-        D1 = calculate_D_point(O1, tetta1, alpha1, beta1, gamma1)
-        self.logger.info('[Init] Building leg 1')
-        Leg1 = Leg(O1, D1)
-
-        O2 = Point(k_cfg.leg["mount_point_offset"],
-                   -k_cfg.leg["mount_point_offset"],
-                   0)
-        tetta2, alpha2, beta2, gamma2 = deviant_position[4:8]
-        #print(f'Leg2 : {[round(math.degrees(x), 2) for x in [tetta2, alpha2, beta2, gamma2]]}')
-        D2 = calculate_D_point(O2, tetta2, alpha2, beta2, gamma2)
-        self.logger.info('[Init] Building leg 2')
-        Leg2 = Leg(O2, D2)
-        #print(f'Leg2.2:{[round(math.degrees(x), 2) for x in [Leg2.tetta, Leg2.alpha, Leg2.beta, Leg2.gamma]]}')
-
-        O3 = Point(-k_cfg.leg["mount_point_offset"],
-                   -k_cfg.leg["mount_point_offset"],
-                   0)
-        tetta3, alpha3, beta3, gamma3 = deviant_position[8:12]
-        #print(f'Leg3 : {[round(math.degrees(x), 2) for x in [tetta3, alpha3, beta3, gamma3]]}')
-        D3 = calculate_D_point(O3, tetta3, alpha3, beta3, gamma3)
-        self.logger.info('[Init] Building leg 3')
-        Leg3 = Leg(O3, D3)
-
-        O4 = Point(-k_cfg.leg["mount_point_offset"],
-                   k_cfg.leg["mount_point_offset"],
-                   0)
-        tetta4, alpha4, beta4, gamma4 = deviant_position[12:16]
-        #print(f'Leg4 : {[round(math.degrees(x), 2) for x in [tetta4, alpha4, beta4, gamma4]]}')
-        D4 = calculate_D_point(O4, tetta4, alpha4, beta4, gamma4)
-        self.logger.info('[Init] Building leg 4')
-        Leg4 = Leg(O4, D4)
-
-        self.logger.info('[Init] Build successful')
-
-        return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
 
     ################## MOVEMENTS START HERE ##################
     def leg_movement(self, leg_num, leg_delta):
@@ -216,8 +147,6 @@ class DeviantKinematics:
 
     def body_movement(self, delta_x, delta_y, delta_z, snapshot=True):
         self.logger.info(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
-        self.current_body_delta = [x + y for x, y in zip(self.current_body_delta, [delta_x, delta_y, delta_z])]
-        #print(f'self.current_body_delta : {self.current_body_delta}')
         if delta_x == delta_y == delta_z == 0:
             return
 
@@ -226,8 +155,6 @@ class DeviantKinematics:
 
         if snapshot:
             self.add_angles_snapshot('body')
-
-        self.current_legs_offset_v -= delta_z
 
     # ?
     def start(self):
@@ -238,7 +165,6 @@ class DeviantKinematics:
     def reset(self):
         self.logger.info('Processing reset command')
         self.body_to_center()
-        #delta_z = self.current_body_delta[2]
         delta_z = self.legs[1].O.z - self.legs[1].D.z - k_cfg.start["vertical"]
         self.body_movement(0, 0, -delta_z)
 
@@ -248,21 +174,7 @@ class DeviantKinematics:
         self.body_movement(0, 0, -k_cfg.start["vertical"] + 
                                   k_cfg.start["initial_z_position_delta"])
             
-    def legs_D_offsets(self):
-        x_offset = abs(round((self.legs[1].D.x - self.legs[4].D.x)/2))
-        y_offset = abs(round((self.legs[1].D.y - self.legs[2].D.y)/2))
-        return [x_offset, y_offset]
-    
-    def switch_mode(self, mode: str):
-        self.logger.info(f'Switching mode to {mode}')
-        self.reset()
-        required_xy = k_cfg.modes[mode]["horizontal_xy"]
-        current_xy = self.legs_D_offsets()
-        # for now we suppose that x = y
-        delta = required_xy - current_xy[0]
-        if delta != 0:
-            self.reposition_legs(delta, delta)
-    
+
     def body_delta_xy(self, delta_y=k_cfg.start["y_offset_body"], delta_x=0):
         # move body to center
         avg_o_x, avg_o_y, avg_d_x, avg_d_y = 0, 0, 0, 0
@@ -307,7 +219,7 @@ class DeviantKinematics:
         target_leg = self.legs[target_leg_number]
         body_target_point = move_on_a_line(intersection,
                                            target_leg.D,
-                                           self.margin)
+                                           k_cfg.margin)
 
         return body_target_point
 
@@ -338,13 +250,12 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoint')
 
     def leg_move_with_compensation(self, leg_num, delta_x, delta_y):
-        self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.leg_up_single])
-        self.logger.info(f'Processing leg {leg_num} move_end_point {[0, 0, -self.leg_up_single]}')
-        self.move_leg_endpoint(leg_num, [0, 0, -self.leg_up_single])
-        #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
+        self.compensated_leg_movement(leg_num, [delta_x, delta_y, k_cfg.leg_up[1]])
+        self.logger.info(f'Processing leg {leg_num} move_end_point {[0, 0, -k_cfg.leg_up[1]]}')
+        self.move_leg_endpoint(leg_num, [0, 0, -k_cfg.leg_up[1]])
 
     def leg_move_with_compensation_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
-        self.obstacled_leg_up = self.leg_up_single / 2
+        self.obstacled_leg_up = k_cfg.leg_up[1] / 2
         self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
         if move_type == 1:
             if obstacle_z >= 0:
@@ -367,20 +278,15 @@ class DeviantKinematics:
             self.logger.info('Move. Endpoint ok')
         else:
             self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up + obstacle_z])
-        #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
+        #self.compensated_leg_movement(leg_num, [0, 0, -k_cfg.leg_up[2]])
 
     def move_leg_endpoint(self, leg_num, leg_delta):        
         self.legs[leg_num].move_end_point(*leg_delta)
         self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
         self.add_angles_snapshot('endpoint')
 
-    def print_legs_diff(self):
-        print(self.legs_deltas)
-        #for leg_num, leg in self.legs.items():
-        #    print(f'Delta {leg_num} : [{round(leg.D.x - leg.O.x, 2)}, {round(leg.D.y - leg.O.y, 2)}, {round(leg.D.z - leg.O.z, 2)}]')
-        
     # 1-legged movements
-    def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
+    def move_body_straight(self, delta_x, delta_y, leg_seq=[2, 4, 1, 3]):
         for leg_number in leg_seq:
             self.logger.info(f'Processing leg {leg_number} with compensation')
             self.leg_move_with_compensation(leg_number, delta_x, delta_y)
@@ -393,397 +299,26 @@ class DeviantKinematics:
     # phased 2-legged movement
     def move_2_legs_phased_13(self, delta_x: int = 0, delta_y: int = 0) -> None:
         self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
-        #self.body_movement(round(delta_x / 4, 1), round(delta_y / 4, 1), 0)
 
         for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(delta_x, delta_y, self.leg_up)
+            leg.move_end_point(delta_x, delta_y, k_cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')
 
-        #self.body_movement(round(delta_x / 4, 1), round(delta_y / 4, 1), 0)
-
         for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(0, 0, -self.leg_up)
+            leg.move_end_point(0, 0, -k_cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')
         
     def move_2_legs_phased_24(self, delta_x: int = 0, delta_y: int = 0) -> None:
         self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
-        #self.body_movement(round(delta_x / 4, 1), round(delta_y / 4, 1), 0)
 
         for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(delta_x, delta_y, self.leg_up)
+            leg.move_end_point(delta_x, delta_y, k_cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')
 
-        #self.body_movement(round(delta_x / 4, 1), round(delta_y / 4, 1), 0)
-
         for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(0, 0, -self.leg_up)
+            leg.move_end_point(0, 0, -k_cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')      
     
-    
-    """
-    Two phased moves end
-    """
-    # 2-legged movements
-    def move_2_legs(self, delta_y, steps=0):
-        self.leg_up = 5
-        leg_delta_1 = [0, delta_y, self.leg_up]
-        leg_delta_2 = [0, 0, -self.leg_up]
-        leg_delta_3 = [0, 2*delta_y, self.leg_up]
-        offset_y = 0
-
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_1)
-        self.add_angles_snapshot('endpoints')
-        # self.body_movement(0, -offset_y, 0)
-
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_2)
-
-        #self.add_angles_snapshot()
-        
-        self.body_movement(0, delta_y + offset_y, 0) # it adds snapshot itself
-
-        #self.add_angles_snapshot()
-        #self.body_movement(0, delta_y, 0)
-
-        ##########
-        if steps > 1:
-            for _ in range(steps-1):
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_3)
-                self.add_angles_snapshot('endpoints')
-                #self.body_movement(0, -offset_y, 0)
-
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_2)
-                
-                #self.add_angles_snapshot()
-
-                self.body_movement(0, delta_y + offset_y, 0)
-
-                #self.add_angles_snapshot()
-                #self.body_movement(0, delta_y, 0)
-
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_3)
-                self.add_angles_snapshot('endpoints')
-                #self.body_movement(0, -offset_y, 0)
-
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_2)
-
-                #self.add_angles_snapshot()
-                self.body_movement(0, delta_y + offset_y, 0)
-
-                #self.add_angles_snapshot()
-                #self.body_movement(0, delta_y, 0)
-
-        ##########
-
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_1)
-        self.add_angles_snapshot('endpoints')
-
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_2)
-        self.add_angles_snapshot('endpoints')
-    
-    # body movement not while legs are going down
-    def move_2_legs_v2(self, delta_y, steps=0):
-        leg_delta_1 = [0, delta_y, self.leg_up]
-        leg_delta_2 = [0, 0, -self.leg_up]
-        leg_delta_3 = [0, 2*delta_y, self.leg_up]
-        offset_y = 0
-
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_1)
-        self.add_angles_snapshot('endpoints')
-        # self.body_movement(0, -offset_y, 0)
-
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_2)
-
-        self.add_angles_snapshot('endpoints')
-        
-        self.body_movement(0, delta_y + offset_y, 0) # it adds snapshot itself
-
-        ##########
-        if steps > 1:
-            for _ in range(steps-1):
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_3)
-                self.add_angles_snapshot('endpoints')
-
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_2)
-                
-                self.add_angles_snapshot('endpoints')
-
-                self.body_movement(0, delta_y + offset_y, 0)
-
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_3)
-                self.add_angles_snapshot('endpoints')
-
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_2)
-
-                self.add_angles_snapshot('endpoints')
-                self.body_movement(0, delta_y + offset_y, 0)
-
-        ##########
-
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_1)
-        self.add_angles_snapshot('endpoints')
-
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_2)
-        self.add_angles_snapshot('endpoints')
-
-    def climb_2_legs(self, delta_z, steps_arr=[8, 12, 12, 12, 8, 12, 8]): #steps_arr=[8, 16, 16, 6, 6, 8]
-        positive_delta_z = 0 # for climbing up
-        negative_delta_z = 0 # for climbing down
-        if delta_z > 0:
-            positive_delta_z = delta_z
-        else:
-            negative_delta_z = delta_z
-
-        #tst_leg_up = round(self.leg_up/2)
-        tst_leg_up = 6 # 6 #5
-
-        legs_z_up_delta = {1: tst_leg_up, 
-                           2: tst_leg_up,
-                           3: tst_leg_up,
-                           4: tst_leg_up}
-        
-        legs_z_down_delta = {1: -tst_leg_up, 
-                             2: -tst_leg_up,
-                             3: -tst_leg_up,
-                             4: -tst_leg_up}
-
-        sum_even, sum_odd, sum_body_movement = 0, 0, 0
-        for step, value in enumerate(steps_arr):
-            current_delta_z_up = {key: value for key, value in legs_z_up_delta.items()}
-            current_delta_z_down = {key: value for key, value in legs_z_down_delta.items()}
-            
-            """
-            if step == 0 or step == len(steps_arr) - 1:
-                body_movement_value = value
-            else:
-                body_movement_value = round(value/2)
-            """
-            
-            if step == 0:
-                body_movement_value = value
-            elif step == len(steps_arr) - 1:
-                body_movement_value = 0
-            else:
-                body_movement_value = round(value/2)
-            
-            sum_body_movement += body_movement_value
-
-            if step == 0:
-                # print('Leg with delta z is 4')
-                current_delta_z_up[4] += positive_delta_z
-                current_delta_z_down[4] += negative_delta_z
-            if step == 1:
-                # print('Leg with delta z id 1')
-                current_delta_z_up[1] += positive_delta_z
-                current_delta_z_down[1] += negative_delta_z
-
-            if step % 2 == 0:
-                sum_even += value
-                if step >= len(steps_arr) - 2:
-                    # print('Leg with delta z is 2')
-                    current_delta_z_up[2] += positive_delta_z
-                    current_delta_z_down[2] += negative_delta_z
-                # print('Moving legs 2, 4')
-                legs_to_move = [2, 4]                
-            else:
-                sum_odd += value
-                if step >= len(steps_arr) - 2:
-                    # print('Leg with delta z is 3')
-                    current_delta_z_up[3] += positive_delta_z
-                    current_delta_z_down[3] += negative_delta_z
-                legs_to_move = [1, 3]
-                # print('Moving legs 1, 3')
-            
-            # up
-            for leg_number in legs_to_move:
-                #self.legs[leg_number].move_end_point(0, -2, current_delta_z_up[leg_number])
-                self.legs[leg_number].move_end_point(0, 0, current_delta_z_up[leg_number])
-            self.add_angles_snapshot('endpoint')
-
-            # forward
-            for leg_number in legs_to_move:
-                #self.legs[leg_number].move_end_point(0, value + 2, 0)
-                self.legs[leg_number].move_end_point(0, value, 0)
-            self.add_angles_snapshot('endpoint')
-
-            # down
-            for leg_number in legs_to_move:
-                self.legs[leg_number].move_end_point(0, 0, current_delta_z_down[leg_number])
-            self.add_angles_snapshot('endpoint')
-
-            self.body_movement(0, body_movement_value, 0) # it adds snapshot itself
-        
-        if sum_even != sum_odd or sum_even != sum_body_movement:
-            raise Exception(f'Bad step lengths: odd ({sum_odd}) and even ({sum_even}) and body({sum_body_movement}) not equal')
-    
-        self.current_legs_offset_v += delta_z
-
-    def reposition_legs(self, delta_x, delta_y):
-        self.logger.info(f'reposition_legs ({delta_x}, {delta_y})')
-        if delta_x == delta_y == 0:
-            return None
-
-        self.legs[2].move_end_point(delta_x, -delta_y, self.leg_up)
-        self.legs[4].move_end_point(-delta_x, delta_y, self.leg_up)
-        self.add_angles_snapshot('endpoints')
-
-        self.legs[2].move_end_point(0, 0, -self.leg_up)
-        self.legs[4].move_end_point(0, 0, -self.leg_up)
-        self.add_angles_snapshot('endpoints')
-
-        self.legs[1].move_end_point(delta_x, delta_y, self.leg_up)
-        self.legs[3].move_end_point(-delta_x, -delta_y, self.leg_up)
-        self.add_angles_snapshot('endpoints')
-
-        self.legs[1].move_end_point(0, 0, -self.leg_up)
-        self.legs[3].move_end_point(0, 0, -self.leg_up)
-        self.add_angles_snapshot('endpoints')
-
-        self.current_legs_offset_h_x += delta_x
-        self.current_legs_offset_h_y += delta_y
-
-    def turn_move(self, angle_deg):
-        self.turn(-angle_deg)
-        self.turn(angle_deg, only_body=True)  
-
-    def turn(self, angle_deg, only_body=False):
-        angle = math.radians(angle_deg)
-
-        center_x = round((self.legs[2].O.x + self.legs[4].O.x) / 2, 2)
-        center_y = round((self.legs[2].O.y + self.legs[4].O.y) / 2, 2)
-
-        for leg in [self.legs[2], self.legs[4]]:
-            x_new, y_new = turn_on_angle(center_x, center_y, leg.D.x, leg.D.y, angle)
-            delta_x = x_new - leg.D.x
-            delta_y = y_new - leg.D.y
-
-            leg.move_end_point(delta_x, delta_y, self.leg_up)
-
-        if not only_body:
-            self.add_angles_snapshot()
-
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(0, 0, -self.leg_up)
-
-        if not only_body:
-            self.add_angles_snapshot()
-
-        for leg in [self.legs[1], self.legs[3]]:
-            x_new, y_new = turn_on_angle(center_x, center_y, leg.D.x, leg.D.y, angle)
-            delta_x = x_new - leg.D.x
-            delta_y = y_new - leg.D.y
-
-            leg.move_end_point(delta_x, delta_y, self.leg_up)
-
-        if not only_body:
-            self.add_angles_snapshot()
-
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(0, 0, -self.leg_up)
-
-        self.add_angles_snapshot('endpoint')
-        self.side_look_angle += angle
-
-    def look_on_angle_new(self, up):
-        angle = k_cfg.moves['vertical_look_angle']
-        x = k_cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
-        z = k_cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
-        
-        for leg in [self.legs[1], self.legs[4]]:
-            if up:
-                leg.move_mount_point(0, -x, z)
-            else:
-                leg.move_mount_point(0, x, -z)
-        for leg in [self.legs[2], self.legs[3]]:
-            if up:
-                leg.move_mount_point(0, x, -z)
-            else:
-                leg.move_mount_point(0, -x, z)
-
-        self.add_angles_snapshot('body')
-
-    # looks like this is bugged in cached kinematics, cuz current angle not working well
-    def look_on_angle(self, angle):
-        current_angle = self.current_angle
-
-        x_current = k_cfg.leg["mount_point_offset"] * \
-                    math.cos(math.radians(current_angle))
-        z_current = k_cfg.leg["mount_point_offset"] * \
-                    math.sin(math.radians(current_angle))
-
-        x_target = k_cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
-        z_target = k_cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
-
-        x = x_current - x_target
-        z = z_current - z_target
-
-        for leg in [self.legs[1], self.legs[4]]:
-            leg.move_mount_point(0, -x, z)
-        for leg in [self.legs[2], self.legs[3]]:
-            leg.move_mount_point(0, x, -z)
-
-        self.add_angles_snapshot('body')
-
-        self.current_angle = angle
-
-    # Obstacles processing
-    def move_body_up(self, delta_z):
-        self.body_movement(0, 0, delta_z)
-
-    def move_body_down(self, delta_z):
-        self.body_movement(0, 0, -delta_z)
-
-
-    def move_according_to_plan(self, plan: List[Move]):
-        self.successful_moves = 0
-        #print('------------BEFORE--------------')
-        #for item in self.D_points_history:
-        #    print(item)
-        #print('------------BEFORE--------------')
-        for move in plan:
-            try:
-                if move.command == 'forward':
-                    self.move_1_legged_for_diff(move)
-                elif move.command == 'up':
-                    self.move_body_up(move.value)
-                elif move.command == 'down':
-                    self.move_body_down(move.value)
-                self.successful_moves += 1
-            except Exception as e:
-                print(f'Successful moves : {self.successful_moves}')
-                raise Exception(e)
-        #print('------------AFTER--------------')
-        #for item in self.D_points_history:
-        #    print(item)
-        #print('------------AFTER--------------')
-
-    def move_1_legged_for_diff(self, move: Move):
-        #for leg_number, deltas in move.target_legs_position.items():
-        self.logger.info(f'Move. : {move}')
-        #for leg_number in [1, 3, 4, 2]:
-        for leg_number in [1, 4, 2, 3]:
-            deltas = move.target_legs_position[leg_number]
-            self.logger.info(f'Move. Deltas : {deltas}')
-            D = self.legs[leg_number].D
-            diff = [deltas[0] - D.x, deltas[1] - D.y, deltas[2] - D.z]
-            self.logger.info(f'Move. Diff : {diff}')
-            self.leg_move_with_compensation_obstacled(leg_number, *diff, move_type=2)
-        self.body_to_center()
 
 if __name__ == '__main__':
     fk = DeviantKinematics()
@@ -791,7 +326,3 @@ if __name__ == '__main__':
     print(angles)
     converted_angles = convert_legs_angles(angles)
     print(converted_angles)
-    #deviant_position = convert_legs_angles_back(angles)
-    #print(f'FP : {deviant_position}')
-    #fk2 = DeviantKinematics(deviant_position=deviant_position)
-    #print(fk2.sequence)

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class MoveSnapshot:
     move_type: str
-    angles_snapshot: List[float]
+    angles_snapshot: Dict[str, float]
 
 class Sequence:
     def __init__(self, moves: List[MoveSnapshot]):

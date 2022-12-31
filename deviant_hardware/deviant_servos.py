@@ -34,26 +34,26 @@ class WheelsDirection(Enum):
 
 def convert_kinematic_angles_to_ids(angles: Dict[str, Dict[str, float]]) -> Dict[id, float]:
     angles_to_ids_values = {
-        2  : angles["leg1"].get("delta", 0),
-        3  : angles["leg1"]["gamma"],
-        4  : angles["leg1"]["beta"],
-        5  : angles["leg1"]["alpha"],
-        6  : angles["leg1"]["tetta"],
-        8  : angles["leg2"].get("delta", 0),
-        9  : angles["leg2"]["gamma"],
-        10 : angles["leg2"]["beta"],
-        11 : angles["leg2"]["alpha"],
-        12 : angles["leg2"]["tetta"],
-        14 : angles["leg3"].get("delta", 0),
-        15 : angles["leg3"]["gamma"],
-        16 : angles["leg3"]["beta"],
-        17 : angles["leg3"]["alpha"],
-        18 : angles["leg3"]["tetta"],
-        20 : angles["leg4"].get("delta", 0),
-        21 : angles["leg4"]["gamma"],
-        22 : angles["leg4"]["beta"],
-        23 : angles["leg4"]["alpha"],
-        24 : angles["leg4"]["tetta"],
+        2  : angles.get("leg1_delta", 0),
+        3  : angles["leg1_gamma"],
+        4  : angles["leg1_beta"],
+        5  : angles["leg1_alpha"],
+        6  : angles["leg1_tetta"],
+        8  : angles.get("leg2_delta", 0),
+        9  : angles["leg2_gamma"],
+        10 : angles["leg2_beta"],
+        11 : angles["leg2_alpha"],
+        12 : angles["leg2_tetta"],
+        14 : angles.get("leg3_delta", 0),
+        15 : angles["leg3_gamma"],
+        16 : angles["leg3_beta"],
+        17 : angles["leg3_alpha"],
+        18 : angles["leg3_tetta"],
+        20 : angles.get("leg4_delta", 0),
+        21 : angles["leg4_gamma"],
+        22 : angles["leg4_beta"],
+        23 : angles["leg4_alpha"],
+        24 : angles["leg4_tetta"],
     }
 
     return angles_to_ids_values
@@ -107,20 +107,20 @@ class DeviantServos:
     def adapt_delta_angle(self, angles: Dict[str, Dict[str, float]]) -> Dict[str, Dict[str, float]]:
         adapted_angles = {**angles}
         if self.wheels_direction == WheelsDirection.FORWARD:
-            adapted_angles["leg1"]["delta"] = adapted_angles["leg1"]["tetta"] + 45
-            adapted_angles["leg2"]["delta"] = adapted_angles["leg2"]["tetta"] - 45
-            adapted_angles["leg3"]["delta"] = adapted_angles["leg3"]["tetta"] + 45
-            adapted_angles["leg4"]["delta"] = adapted_angles["leg4"]["tetta"] - 45
+            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 45
+            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 45
+            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 45
+            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 45
         elif self.wheels_direction == WheelsDirection.SIDEWAYS:
-            adapted_angles["leg1"]["delta"] = adapted_angles["leg1"]["tetta"] - 45
-            adapted_angles["leg2"]["delta"] = adapted_angles["leg2"]["tetta"] + 45
-            adapted_angles["leg3"]["delta"] = adapted_angles["leg3"]["tetta"] - 45
-            adapted_angles["leg4"]["delta"] = adapted_angles["leg4"]["tetta"] + 45
+            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 45
+            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 45
+            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 45
+            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] + 45
         elif self.wheels_direction in (WheelsDirection.TURN, WheelsDirection.WALK):
-            adapted_angles["leg1"]["delta"] = adapted_angles["leg1"]["tetta"] + 75
-            adapted_angles["leg2"]["delta"] = adapted_angles["leg2"]["tetta"] - 75
-            adapted_angles["leg3"]["delta"] = adapted_angles["leg3"]["tetta"] + 75
-            adapted_angles["leg4"]["delta"] = adapted_angles["leg4"]["tetta"] - 75
+            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 75
+            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 75
+            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 75
+            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 75
         return adapted_angles
 
     def send_command_to_servos(self, angles, rate=1000):
@@ -140,6 +140,13 @@ class DeviantServos:
             for id in self.motor_ids:
                 self.get_board_by_id(id).motor_or_servo(id, 1, 0)
 
+    def process_motors_command(self, command, speed):
+        if command in ('forward', 'backwards'):
+            self.wheels_direction = WheelsDirection.FORWARD
+        if command == 'backwards':
+            speed = -speed
+        self.send_command_to_motors(speed)
+
     def print_status(self):
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:
@@ -153,6 +160,7 @@ class DeviantServos:
         self.speed = new_speed
         self.logger.info(f'DeviantServos. Speed set to {self.speed}')
 
+    # TODO: adapt
     def angles_are_close(self, target_angles):
         """
         compares self angles to target angles
@@ -166,16 +174,7 @@ class DeviantServos:
                 return False
 
         return True
-    
-    def log_servo_data(self):
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:
-            for _ in range(4):
-                self.logger.info(read_values(m, j))
-                time.sleep(0.0002)
-                j += 1
 
-    #@timing
     def set_servo_values_paced(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
@@ -233,56 +232,6 @@ class DeviantServos:
 
             prev_angles = current_angles[:]
     
-    def set_servo_values_paced_wo_adjustment(self, angles):
-        _, max_angle_diff = self.get_angles_diff(angles)
-        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
-        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
-        
-        self.send_command_to_servos(angles, rate)
-        self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
-        #time.sleep(0.8 * rate / 1000)
-        time.sleep(0.05)
-
-        prev_angles = self.get_current_angles()
-        for s in range(50):
-            self.logger.info(f'Step {s}')
-            #time.sleep(0.02)
-            
-            current_angles = self.get_current_angles()
-            self.logger.info(f'current angles: {current_angles}')
-            # if diff from prev angles or target angles is small - continue
-            diff_from_target = self.get_angles_diff(angles, current_angles)
-            diff_from_prev = self.get_angles_diff(current_angles, prev_angles)
-
-            self.logger.info(f'Diff from prev  : {diff_from_prev[0]}')
-            self.logger.info(f'Diff from target: {diff_from_target[0]}')
-     
-            if diff_from_target[1] < self.diff_from_target_limit:                
-                self.logger.info(f'Ready to move further')
-                break
-            
-            elif diff_from_prev[1] < self.diff_from_prev_limit:
-                self.logger.info(f'Unreachable. Moving further')
-                break
-
-            prev_angles = current_angles[:]
-
-    def set_servo_values_paced_wo_feedback_w_adjustment(self, angles):
-        _, max_angle_diff = self.get_angles_diff(angles)
-        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
-        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
-        
-        current_angles = self.get_current_angles()
-        self.logger.info(f'current angles: {current_angles}')
-
-        diff_from_target = self.get_angles_diff(angles, current_angles)
-
-        adjusted_angles = [round(target + (0.1 * diff), 1) for target, diff in zip(angles, diff_from_target[0])]
-
-        self.send_command_to_servos(adjusted_angles, rate)
-        self.logger.info(f'Command sent. Rate: {rate}, angles: {adjusted_angles}')
-        time.sleep(rate / 1000)
-    
     def set_servo_values_paced_wo_feedback(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
@@ -291,64 +240,17 @@ class DeviantServos:
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
         time.sleep(rate / 1000)
-            
-    def set_servo_values_not_paced(self, angles):
-        # every command is executed over fixed time (1 sec for speed = 1000)
-        self.send_command_to_servos(angles, int(self.speed * 0.9))
-        wait_time = max(0, self.speed / 1000 - config.deviant['movement_command_advance_ms'])
-        self.logger.info(f'Wait time : {wait_time}, speed : {int(self.speed * 0.9)}')
-        time.sleep(wait_time)
-
-    def set_servo_values_not_paced_v2(self, angles, prev_angles=None):
-        # every command is executed over a computed time, depending on the angle
-        _, max_angle_diff = self.get_angles_diff(angles, prev_angles)
-        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
-        wait_time = max(0, rate / 1000 - config.deviant['movement_command_advance_ms'])
-
-        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
-        self.logger.info(f'Wait time : {wait_time}')
-        
-        self.send_command_to_servos(angles, rate)
-        
-        time.sleep(wait_time)
-        self.logger.info(f'[DIFF] Diff with target:')
-        self.get_angles_diff(angles)
-
-    def set_servo_values_not_paced_v3(self, angles, prev_angles=None):
-        angles_diff, max_angle_diff = self.get_angles_diff(angles, prev_angles)
-        rate = round(max(self.speed * (1 + config.deviant['movement_overshoot_coefficient']) * max_angle_diff / 45, self.max_speed)) # speed is normalized
-        wait_time = max(0, rate / 1000 - config.deviant['movement_command_advance_ms'])
-
-        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
-        self.logger.info(f'Wait time : {wait_time}')
-
-        adjusted_angles = [round(target + (config.deviant['movement_overshoot_coefficient'] * diff), 1) for target, diff in zip(angles, angles_diff)]
-
-        self.logger.info(f'{angles} ->\n{adjusted_angles}')
-        
-        self.send_command_to_servos(adjusted_angles, rate)
-        
-        time.sleep(wait_time)
-        self.logger.info(f'[DIFF] Diff from target:')
-        self.get_angles_diff(angles)
-    
-    def set_servo_values_for_running(self, angles, rate=config.speed["run"]):
-        wait_time = max(0, rate / 1000 - config.deviant['movement_command_advance_ms'])
-        self.logger.info(f'Wait time : {wait_time}')
-        
-        self.send_command_to_servos(angles, rate)
-        
-        time.sleep(wait_time)
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:
             test_angles = self.get_current_angles()
 
-        angles_diff = []
-        for current, target in zip(test_angles, target_angles):
-            angles_diff.append(round(current - target, 2))
-        max_angle_diff = max([abs(x) for x in angles_diff])
-        self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff])/16}. Sum : {sum([abs(x) for x in angles_diff])}')
+        angles_diff = {}
+        for angle, value in target_angles.items():
+            angles_diff[angle] = value
+
+        max_angle_diff = max([abs(x) for x in angles_diff.values()])
+        self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff.values()])/len(angles_diff)}. Sum : {sum([abs(x) for x in angles_diff.values()])}')
         return angles_diff, max_angle_diff
 
 

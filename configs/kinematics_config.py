@@ -44,10 +44,7 @@ start = {
     "initial_z_position_delta" : 5, # 3
 }
 
-margin = {
-    1: 5,
-    2: 6
-}
+margin = 5
 
 leg_up = {
     1: 7,
