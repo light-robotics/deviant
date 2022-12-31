@@ -15,7 +15,7 @@ angles = {
         "ideal": 0,
     },
     "alpha": {
-        "min": -40,
+        "min": -60,
         "max": 73,
     },
     "beta": {
@@ -37,16 +37,16 @@ angles = {
 }
 
 start = {
-    "vertical"                 : 20,
-    "horizontal_x"             : 13,
-    "horizontal_y"             : 13,
+    "vertical"                 : 14,
+    "horizontal_x"             : 14,
+    "horizontal_y"             : 14,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
 
-margin = 5
+margin = 3
 
 leg_up = {
-    1: 7,
-    2: 4
+    1: 5,
+    2: 5
 }

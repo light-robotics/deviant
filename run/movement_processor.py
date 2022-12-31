@@ -129,8 +129,8 @@ class MovementProcessor:
 
     def move_function_dispatch(self, command: str) -> Callable:
         if command in ['forward_one_legged']:
-            self.logger.info('Using function set_servo_values_paced')
-            return self.ds.set_servo_values_paced
+            self.logger.info('Using function set_servo_values_paced_wo_feedback')
+            return self.ds.set_servo_values_paced_wo_feedback
         elif command in ['forward_1', 'forward_2', 'forward_3', 'forward_22', 'forward_32']:
             self.logger.info('Using function set_servo_values_paced_wo_feedback')
             return self.ds.set_servo_values_paced_wo_feedback

@@ -282,7 +282,7 @@ class DeviantKinematics:
 
     def move_leg_endpoint(self, leg_num, leg_delta):        
         self.legs[leg_num].move_end_point(*leg_delta)
-        self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
+        #self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
         self.add_angles_snapshot('endpoint')
 
     # 1-legged movements

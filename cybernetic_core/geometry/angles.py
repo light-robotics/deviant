@@ -222,10 +222,9 @@ def convert_legs_angles_back(legs_angles_converted: List[float]) -> List[float]:
     return angles_initial
 
 def get_best_angles(all_angles):
-    best_angles = min(all_angles, key=get_angles_distance)
-
-    if best_angles is None:        
+    if len(all_angles) == 0:
         raise Exception('No angles')
+    best_angles = min(all_angles, key=get_angles_distance)
 
     return best_angles
 
