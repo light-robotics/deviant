@@ -90,11 +90,9 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     logger.info(f'Trying l {l} and delta_z {delta_z}')
     alpha, beta, gamma = get_leg_angles(l, delta_z, logger)
     
-    logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}, {math.degrees(gamma)}')
+    logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
 
     D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma)
-    #logger.info(f'[CLA] D initial : {D}')
-    #logger.info(f'[CLA] D calculated : {D_calculated}')
 
     if abs(D_calculated.x - D.x) > 0.01 or \
         abs(D_calculated.y - D.y) > 0.01 or \
@@ -276,54 +274,8 @@ O : Point(x=-3.8, y=3.8, z=11). D : Point(x=-18, y=15, z=0)
 
 if __name__ == '__main__':
     logging.config.dictConfig(code_config.logger_config)
-    logger = logging.getLogger('main_logger')
+    logger = logging.getLogger('angles_logger')
 
-    #print(calculate_leg_angles(Point(x=3.8, y=-3.8, z=0), Point(x=18.0, y=-21.0, z=-11.0), 'rear_leg', logger))
-    # [2022-03-09 23:22:21,571][INFO] Trying l 3.46 and delta_z -14.22
-    O = Point(x=3.8, y=-3.8, z=0)
-    D = Point(x=7.24, y=-3.69, z=-14.22)
-    calculate_leg_angles(O, D, logger)
-
-    # D initial : Point(x=7.24, y=-3.69, z=-14.22)
-    # D calcula : Point(x=14.15, y=-3.47, z=-14.22)
-
-    """
-    initial_angles = [-1.221893261879673, -1.2639702727274524, 0.932520500332173, 0.6678325892598048, 
-                      -1.0368117081026034, -1.0753113837445074, 0.7856728603314223, -0.8806504408162148, 
-                      -1.0368117081026034, -1.0753113837445074, 0.7856728603314223, -2.2609422127735783, 
-                      -1.221893261879673, -1.2639702727274524, 0.932520500332173, 2.4737600643299884]
-    # was gamma, beta, alpha, tetta one leg after another
-    # now tetta, alpha, beta, gamma one leg after another
-    new_initial_angles = [0.6678325892598048, 0.932520500332173, -1.2639702727274524, -1.221893261879673, 
-                          -0.8806504408162148, 0.7856728603314223, -1.0753113837445074, -1.0368117081026034, 
-                          -2.2609422127735783, 0.7856728603314223, -1.0753113837445074, -1.0368117081026034, 
-                          2.4737600643299884, 0.932520500332173, -1.2639702727274524, -1.221893261879673]
-
-    converted_new = convert_legs_angles(new_initial_angles)
-    print(converted_new)
-    converted_new_back = convert_legs_angles_back(converted_new)
-    print(converted_new_back)
-
-    for i in range(len(new_initial_angles)):
-        if abs(new_initial_angles[i] - converted_new_back[i]) > 0.001:
-            print(f'{i} : {abs(new_initial_angles[i] - converted_new_back[i])}')
-
+    alpha, beta, gamma = get_leg_angles(11.0, -8, logger)
     
-    print([round(math.degrees(x), 2) for x in initial_angles])
-    angles_converted = [-6.74, 53.43, 72.42, -47.510000000000005, -5.46, 45.02, 61.61, -36.9, 5.46, 45.02, 61.61, -36.9, 6.74, 53.43, 72.42, -47.510000000000005]
-    print(convert_legs_angles(initial_angles))
-
-    print(-1.221893261879673)
-    print(convert_gamma(-1.221893261879673))
-    print(convert_gamma_back(convert_gamma(-1.221893261879673)))
-    
-    O = Point(x=3.8, y=3.8, z=11)
-    tetta, alpha, beta, gamma = calculate_leg_angles(O, Point(x=18, y=15, z=0), 'front_leg', logger)
-    print(tetta, alpha, beta, gamma)
-    D = calculate_D_point(O, tetta, alpha, beta, gamma)
-    print(D)
-    
-    print(calculate_leg_angles(Point(x=3.8, y=-3.8, z=11), Point(x=18, y=-21, z=0), 'rear_leg', logger))
-    print(calculate_leg_angles(Point(x=-3.8, y=-3.8, z=11), Point(x=-18, y=-21, z=0), 'rear_leg', logger))
-    print(calculate_leg_angles(Point(x=-3.8, y=3.8, z=11), Point(x=-18, y=15, z=0), 'front_leg', logger))
-    """
+    logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
