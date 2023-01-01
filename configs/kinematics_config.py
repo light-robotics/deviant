@@ -9,9 +9,9 @@ leg = {
 
 angles = {
     "to_surface": {
-        "min" : -90,
-        "max" : 90,
-        "step": 1,
+        "min" : -40,
+        "max" : 40,
+        "step": 5,
         "ideal": 0,
     },
     "alpha": {
@@ -37,16 +37,16 @@ angles = {
 }
 
 start = {
-    "vertical"                 : 8,
-    "horizontal_x"             : 14,
-    "horizontal_y"             : 14,
-    "y_offset_body"            : 0,
+    "vertical"                 : 24,
+    "horizontal_x"             : 10,
+    "horizontal_y"             : 18,
+    "x_offset_body"            : 0.5,
     "initial_z_position_delta" : 5, # 3
 }
 
-margin = 3
+margin = 7
 
 leg_up = {
-    1: 5,
+    1: 7,
     2: 5
 }

@@ -137,7 +137,7 @@ class LX16A:
     # several attempts are made to send servo to a certain angle
     # because sometimes command does not work and target stays unchanged
     def move_servo_to_angle(self, id: int, angle: float, rate: int = 0) -> None:
-        position = neutral[id] + int(angle/0.24)
+        position = max(neutral[id] + int(angle/0.24), 0)
         num_attempts = 3
         for i in range(num_attempts):
             try:
@@ -155,8 +155,8 @@ class LX16A:
                     self.logger.info(f'Id : {id}. Target required : {position}. Target real : {target}')
                     continue
                 break
-            except Exception as e:
-                self.logger.info(f'{i} attempt failed for servo {id}.\n{e}')
+            except struct.error as err:
+                self.logger.info(f'{i} attempt failed for servo {id}. struct.error: \n{err}')
       
     # read target position and rate
     def read_servo_target(self, id: int) -> Union[int, int]:

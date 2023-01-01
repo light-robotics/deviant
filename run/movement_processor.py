@@ -53,8 +53,8 @@ class MovementProcessor:
             'backward_two_legged',
             'strafe_left_two_legged',
             'strafe_right_two_legged', 
-            'up', 
-            'down',
+            #'up', 
+            #'down',
             'body_forward',
             'body_backward',
             'body_left',
@@ -129,14 +129,14 @@ class MovementProcessor:
 
     def move_function_dispatch(self, command: str) -> Callable:
         if command in ['forward_one_legged']:
-            self.logger.info('Using function set_servo_values_paced_wo_feedback')
-            return self.ds.set_servo_values_paced_wo_feedback
+            self.logger.info('Using function set_servo_values_paced_full_adjustment')
+            return self.ds.set_servo_values_paced_full_adjustment
         elif command in ['forward_1', 'forward_2', 'forward_3', 'forward_22', 'forward_32']:
             self.logger.info('Using function set_servo_values_paced_wo_feedback')
             return self.ds.set_servo_values_paced_wo_feedback
         else:
-            self.logger.info('Using function set_servo_values_paced')
-            return self.ds.set_servo_values_paced
+            self.logger.info('Using function set_servo_values_paced_full_adjustment')
+            return self.ds.set_servo_values_paced_full_adjustment
                         
     def run_sequence(self, command: str) -> None:                   
         self.logger.info(f'MOVE. Trying command {command}')

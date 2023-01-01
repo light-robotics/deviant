@@ -90,7 +90,8 @@ class DeviantServos:
     def get_current_angles(self) -> Dict[int, float]:
         current_angles = {}
         for id in self.servo_ids:
-            current_angles[id] = self.get_board_by_id(id).read_angle(id)
+            angle_name = servos_to_angles_mapping[id]
+            current_angles[angle_name] = self.get_board_by_id(id).read_angle(id)
         return current_angles
 
     def adapt_delta_angle(self, angles: Dict[str, Dict[str, float]]) -> Dict[str, Dict[str, float]]:
@@ -132,6 +133,9 @@ class DeviantServos:
     def process_motors_command(self, command, speed):
         if command in ('forward', 'backwards'):
             self.wheels_direction = WheelsDirection.FORWARD
+        elif command in ('walking'):
+            self.wheels_direction = WheelsDirection.WALK
+            speed = 0
         if command == 'backwards':
             speed = -speed
         self.send_command_to_motors(speed)
@@ -172,8 +176,8 @@ class DeviantServos:
 
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
-        #time.sleep(0.8 * rate / 1000)
-        time.sleep(0.05)
+        time.sleep(0.8 * rate / 1000)
+        #time.sleep(0.05)
         adjustment_done = False
         
         for s in range(50):
@@ -206,10 +210,10 @@ class DeviantServos:
                 else:
                     adjusted_angles = {}
                     for angle, target in angles.items():
-                        adjusted_angles[angle] = round(target + (-1.5 * diff_from_target[0][angle]), 1)
+                        adjusted_angles[angle] = round(target + (1.5 * diff_from_target[0][angle]), 1)
                     self.logger.info(f'Adjusting to : {adjusted_angles}')
                     adjustment_done = True
-                    self.send_command_to_servos(adjusted_angles, 0)
+                    self.send_command_to_servos(adjusted_angles, round(rate/4))
                     time.sleep(0.03)
                     break
 
@@ -227,7 +231,7 @@ class DeviantServos:
 
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
-        time.sleep(0.8 * rate / 1000)
+        time.sleep(0.95 * rate / 1000)
 
         current_angles = self.get_current_angles()
         self.logger.info(f'current angles: {current_angles}')
@@ -237,11 +241,11 @@ class DeviantServos:
 
         adjusted_angles = {}
         for angle, target in angles.items():
-            adjusted_angles[angle] = round(target + (-1.5 * diff_from_target[0][angle]), 1)
+            adjusted_angles[angle] = round(target + (1.5 * diff_from_target[0][angle]), 1)
 
         self.logger.info(f'Adjusting to : {adjusted_angles}')
-        self.send_command_to_servos(adjusted_angles, rate/4)
-        time.sleep(0.3 * rate / 1000)
+        self.send_command_to_servos(adjusted_angles, round(rate/2))
+        time.sleep(0.2 * rate / 1000)
     
         current_angles = self.get_current_angles()
         self.logger.info(f'current angles: {current_angles}')
