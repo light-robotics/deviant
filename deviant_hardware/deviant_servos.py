@@ -175,7 +175,7 @@ class DeviantServos:
 
         return True
 
-    def set_servo_values_paced(self, angles):
+    def set_servo_values_paced_full_adjustment(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
         self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
@@ -189,7 +189,6 @@ class DeviantServos:
         
         for s in range(50):
             self.logger.info(f'Step {s}')
-            #time.sleep(0.02)
             
             current_angles = self.get_current_angles()
             self.logger.info(f'current angles: {current_angles}')
@@ -216,13 +215,13 @@ class DeviantServos:
                     self.logger.info(f'We"re in trouble, too large diff : {diff_from_target[1]}')
                     break
                 else:
-                    #adjusted_angles = [round(target + (-1.5 * diff if abs(diff) > self.diff_from_target_limit else 0), 1) for target, diff in zip(angles, diff_from_target[0])]
-                    adjusted_angles = [round(target + (-1.5 * diff), 1) for target, diff in zip(angles, diff_from_target[0])]
-                    
+                    adjusted_angles = {}
+                    for angle, target in angles.items():
+                        adjusted_angles[angle] = round(target + (-1.5 * diff_from_target[0][angle]), 1)
                     self.logger.info(f'Adjusting to : {adjusted_angles}')
                     adjustment_done = True
                     self.send_command_to_servos(adjusted_angles, 0)
-                    #time.sleep(0.03)
+                    time.sleep(0.03)
                     break
 
             elif diff_from_prev[1] < self.diff_from_prev_limit and \
@@ -230,8 +229,34 @@ class DeviantServos:
                 self.logger.info(f'Unreachable. Moving further')
                 break
 
-            prev_angles = current_angles[:]
+            prev_angles = dict(current_angles)
+
+    def set_servo_values_paced_single_adjustment(self, angles):
+        _, max_angle_diff = self.get_angles_diff(angles)
+        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+
+        self.send_command_to_servos(angles, rate)
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+        time.sleep(0.8 * rate / 1000)
+
+        current_angles = self.get_current_angles()
+        self.logger.info(f'current angles: {current_angles}')
+
+        diff_from_target = self.get_angles_diff(angles, current_angles)
+        self.logger.info(f'Diff from target: {diff_from_target[0]}')
+
+        adjusted_angles = {}
+        for angle, target in angles.items():
+            adjusted_angles[angle] = round(target + (-1.5 * diff_from_target[0][angle]), 1)
+
+        self.logger.info(f'Adjusting to : {adjusted_angles}')
+        self.send_command_to_servos(adjusted_angles, rate/4)
+        time.sleep(0.3 * rate / 1000)
     
+        current_angles = self.get_current_angles()
+        self.logger.info(f'current angles: {current_angles}')
+
     def set_servo_values_paced_wo_feedback(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
