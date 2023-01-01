@@ -14,15 +14,6 @@ import logging.config
 logging.config.dictConfig(code_config.logger_config)
 
 
-@dataclass
-class DeviantLeg:
-    alpha_servo_id: int
-    beta_servo_id: int
-    gamma_servo_id: int
-    delta_servo_id: int
-    tetta_servo_id: int
-
-
 class WheelsDirection(Enum):
     FORWARD        = 1
     TURN           = 2
@@ -31,30 +22,34 @@ class WheelsDirection(Enum):
     DIAGONAL_RIGHT = 5
     DIAGONAL_LEFT  = 6
 
+servos_to_angles_mapping = {
+    2  : "leg1_delta",
+    3  : "leg1_gamma",
+    4  : "leg1_beta",
+    5  : "leg1_alpha",
+    6  : "leg1_tetta",
+    8  : "leg2_delta",
+    9  : "leg2_gamma",
+    10 : "leg2_beta",
+    11 : "leg2_alpha",
+    12 : "leg2_tetta",
+    14 : "leg3_delta",
+    15 : "leg3_gamma",
+    16 : "leg3_beta",
+    17 : "leg3_alpha",
+    18 : "leg3_tetta",
+    20 : "leg4_delta",
+    21 : "leg4_gamma",
+    22 : "leg4_beta",
+    23 : "leg4_alpha",
+    24 : "leg4_tetta",
+}
 
 def convert_kinematic_angles_to_ids(angles: Dict[str, Dict[str, float]]) -> Dict[id, float]:
-    angles_to_ids_values = {
-        2  : angles.get("leg1_delta", 0),
-        3  : angles["leg1_gamma"],
-        4  : angles["leg1_beta"],
-        5  : angles["leg1_alpha"],
-        6  : angles["leg1_tetta"],
-        8  : angles.get("leg2_delta", 0),
-        9  : angles["leg2_gamma"],
-        10 : angles["leg2_beta"],
-        11 : angles["leg2_alpha"],
-        12 : angles["leg2_tetta"],
-        14 : angles.get("leg3_delta", 0),
-        15 : angles["leg3_gamma"],
-        16 : angles["leg3_beta"],
-        17 : angles["leg3_alpha"],
-        18 : angles["leg3_tetta"],
-        20 : angles.get("leg4_delta", 0),
-        21 : angles["leg4_gamma"],
-        22 : angles["leg4_beta"],
-        23 : angles["leg4_alpha"],
-        24 : angles["leg4_tetta"],
-    }
+    angles_to_ids_values = {}
+
+    for servo_id, angle_name in servos_to_angles_mapping.items():
+        angles_to_ids_values[servo_id] = angles.get(angle_name, 0)
 
     return angles_to_ids_values
 
@@ -81,12 +76,6 @@ class DeviantServos:
         # that means that max speed should be 120 for 7.4V+ and 135 for 6V+
         self.servo_ids = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24]
         self.motor_ids = [1, 7, 13, 19]
-        self.angles_mapping = {
-            "leg1": DeviantLeg(5, 4, 3, 2, 6),
-            "leg2": DeviantLeg(11, 10, 9, 8, 12),
-            "leg3": DeviantLeg(17, 16, 15, 14, 18),
-            "leg4": DeviantLeg(23, 22, 21, 20, 24),
-        }
 
     def get_board_by_id(self, id: int) -> LX16A:
         if 1 <= id <= 6:
@@ -272,7 +261,7 @@ class DeviantServos:
 
         angles_diff = {}
         for angle, value in target_angles.items():
-            angles_diff[angle] = value
+            angles_diff[angle] = value - test_angles[angle]
 
         max_angle_diff = max([abs(x) for x in angles_diff.values()])
         self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff.values()])/len(angles_diff)}. Sum : {sum([abs(x) for x in angles_diff.values()])}')
