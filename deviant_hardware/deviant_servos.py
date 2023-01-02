@@ -3,7 +3,7 @@ import sys
 import os
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
+from typing import Dict, List
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from hardware.lx16a import LX16A, read_values
@@ -64,6 +64,7 @@ class DeviantServos:
         self.min_speed = 700
         self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
         self.wheels_direction = WheelsDirection.FORWARD
+        self.motors_locked = False
 
         self.diff_from_target_limit = config.deviant["servos"]["diff_from_target_limit"] # when it's time to start next movement
         self.diff_from_prev_limit = config.deviant["servos"]["diff_from_prev_limit"] # 1.0 # start next movement if we're stuck
@@ -119,11 +120,10 @@ class DeviantServos:
         for id in self.servo_ids:
             self.get_board_by_id(id).move_servo_to_angle(id, angles_converted[id], rate)
 
-    def send_command_to_motors(self, speed: int = 1000, duration: int = 0):
-        self.get_board_by_id(1).motor_or_servo(1, 1, speed)
-        self.get_board_by_id(7).motor_or_servo(7, 1, -speed)
-        self.get_board_by_id(13).motor_or_servo(13, 1, -speed)
-        self.get_board_by_id(19).motor_or_servo(19, 1, speed)
+    def send_command_to_motors(self, speeds: List[float] = [1000, 1000, 1000, 1000], duration: int = 0):
+        for id, speed in zip(self.motor_ids, speeds):
+            self.get_board_by_id(id).motor_or_servo(id, 1, round(speed))
+
         assert duration < 10
         if duration > 0:
             time.sleep(duration)
@@ -133,12 +133,31 @@ class DeviantServos:
     def process_motors_command(self, command, speed):
         if command in ('forward', 'backwards'):
             self.wheels_direction = WheelsDirection.FORWARD
+        elif command in ('turn', 'turn_ccw'):
+            self.wheels_direction = WheelsDirection.TURN
         elif command in ('walking'):
             self.wheels_direction = WheelsDirection.WALK
             speed = 0
-        if command == 'backwards':
+        if abs(speed) > 0:
+            self.motors_locked = False
+
+        if command in ['backwards', 'turn_ccw']:
             speed = -speed
-        self.send_command_to_motors(speed)
+
+        #if command in ['turn', 'turn_ccw']:
+        #    self.send_command_to_motors([speed, speed, speed, speed])
+        #else:    
+        #self.send_command_to_motors([0.8*speed, speed, 0.8*speed, 0.6*speed])
+        self.send_command_to_motors([speed, speed, speed, speed])
+
+    def lock_motors(self):
+        if self.motors_locked:
+            return
+
+        self.logger.info(f'Motors hardlocked')
+        for id in self.motor_ids:
+            self.get_board_by_id(id).move_servo_to_angle(id, 0, 0)
+        self.motors_locked = True
 
     def print_status(self):
         j = 1
@@ -153,20 +172,17 @@ class DeviantServos:
         self.speed = new_speed
         self.logger.info(f'DeviantServos. Speed set to {self.speed}')
 
-    # TODO: adapt
-    def angles_are_close(self, target_angles):
-        """
-        compares self angles to target angles
-        if they are different, return false
-        """
-        current_angles = self.get_current_angles()
+    def get_angles_diff(self, target_angles, test_angles=None):
+        if test_angles is None:
+            test_angles = self.get_current_angles()
 
-        for i in range(16):
-            if abs(current_angles[i] - target_angles[i]) > 2:
-                print('Angles {0} diff too big. {1}, {2}'.format(i, current_angles[i], target_angles[i]))
-                return False
+        angles_diff = {}
+        for angle, value in target_angles.items():
+            angles_diff[angle] = value - test_angles[angle]
 
-        return True
+        max_angle_diff = max([abs(x) for x in angles_diff.values()])
+        self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff.values()])/len(angles_diff)}. Sum : {sum([abs(x) for x in angles_diff.values()])}')
+        return angles_diff, max_angle_diff
 
     def set_servo_values_paced_full_adjustment(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
@@ -258,18 +274,6 @@ class DeviantServos:
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
         time.sleep(rate / 1000)
-
-    def get_angles_diff(self, target_angles, test_angles=None):
-        if test_angles is None:
-            test_angles = self.get_current_angles()
-
-        angles_diff = {}
-        for angle, value in target_angles.items():
-            angles_diff[angle] = value - test_angles[angle]
-
-        max_angle_diff = max([abs(x) for x in angles_diff.values()])
-        self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff.values()])/len(angles_diff)}. Sum : {sum([abs(x) for x in angles_diff.values()])}')
-        return angles_diff, max_angle_diff
 
 
 if __name__ == '__main__':

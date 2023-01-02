@@ -67,8 +67,12 @@ class VirtualDeviant(DeviantKinematics):
             self.body_to_center()
         elif command == 'up':
             self.body_movement(0, 0, UP_OR_DOWN_CM)
+        elif command == 'up_10':
+            self.body_movement(0, 0, 10)
         elif command == 'down':
             self.body_movement(0, 0, -UP_OR_DOWN_CM)
+        elif command == 'down_10':
+            self.body_movement(0, 0, 10)
         elif command == 'reposition_x_up':
             self.reposition_legs(REPOSITION_CM, 0)
         elif command == 'reposition_x_down':

@@ -3,7 +3,7 @@ from typing import List, Dict
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(repr=True)
 class MoveSnapshot:
     move_type: str
     angles_snapshot: Dict[str, float]

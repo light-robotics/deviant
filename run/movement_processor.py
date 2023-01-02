@@ -142,14 +142,16 @@ class MovementProcessor:
         self.logger.info(f'MOVE. Trying command {command}')
         before_sequence_time = datetime.datetime.now()
         self.vd.save_state()
-        try:    
-            sequence = self.vd.get_sequence(command)
+        try:
+            self.vd.reset_history()
+            sequence = self.vd.get_sequence(command)            
 
             if sequence is None:
                 self.logger.info(f'MOVE. Command aborted')
                 self.vd.load_state()
                 return
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
+            self.logger.info('Sequence:'+'\n'.join([str(x) for x in sequence]))
         except Exception as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
@@ -185,6 +187,8 @@ class MovementProcessor:
                     wheels_command, wheels_speed = wheels_command_read
                     if not code_config.DEBUG:
                         self.execute_wheels_command(wheels_command, wheels_speed)
+                        if wheels_speed == 0:
+                            self.ds.lock_motors()
 
                 if servos_command_read is not None:
                     servos_command, servos_speed = servos_command_read
