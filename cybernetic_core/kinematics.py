@@ -140,6 +140,7 @@ class DeviantKinematics:
 
     ################## MOVEMENTS START HERE ##################
     def leg_movement(self, leg_num, leg_delta):
+        self.logger.info(f'Move. Leg {leg_num} for {leg_delta}')
         leg = self.legs[leg_num]
 
         leg.move_end_point(leg_delta[0], leg_delta[1], leg_delta[2])
@@ -150,7 +151,8 @@ class DeviantKinematics:
         if delta_x == delta_y == delta_z == 0:
             return
 
-        for leg in self.legs.values():
+        for leg_num, leg in self.legs.items():
+            self.logger.info(f'Moving mount point for {leg_num}')
             leg.move_mount_point(delta_x, delta_y, delta_z)
 
         if snapshot:
@@ -203,7 +205,7 @@ class DeviantKinematics:
                            0)
 
     # body compensation for moving up one leg
-    def target_body_position(self, leg_in_the_air_number):
+    def target_body_position(self, leg_in_the_air_number, margin=k_cfg.margin):
         """
         provide the number of leg_in_the_air
         return target position of body to let the leg go into the air
@@ -219,13 +221,13 @@ class DeviantKinematics:
         target_leg = self.legs[target_leg_number]
         body_target_point = move_on_a_line(intersection,
                                            target_leg.D,
-                                           k_cfg.margin)
+                                           margin)
 
         return body_target_point
 
-    def body_compensation_for_a_leg(self, leg_num):        
-        target = self.target_body_position(leg_num)
-        self.logger.info(f'Move. body_compensation_for_a_leg. Target : {target}')
+    def body_compensation_for_a_leg(self, leg_num, margin=k_cfg.margin):        
+        target = self.target_body_position(leg_num, margin)
+        self.logger.info(f'Move. body_compensation_for_a_leg {leg_num}. Target : {target}')
         current_body_x = (self.legs[1].O.x +
                           self.legs[2].O.x +
                           self.legs[3].O.x +

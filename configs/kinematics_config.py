@@ -9,8 +9,8 @@ leg = {
 
 angles = {
     "to_surface": {
-        "min" : -30,
-        "max" : 30,
+        "min" : -80,
+        "max" : 80,
         "step": 5,
         "ideal": 0,
     },
