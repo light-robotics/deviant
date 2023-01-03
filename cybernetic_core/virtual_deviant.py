@@ -74,30 +74,30 @@ class VirtualDeviant(DeviantKinematics):
         elif command == 'down_10':
             self.body_movement(0, 0, -10)
         elif command == 'climb_10':
-            forward = 5
-            up = 14
+            forward = 11
+            up = 16
             self.body_movement(0, 0, 8)
             self.body_compensation_for_a_leg(1)
             self.leg_movement(1, [0, 0, up])
             self.leg_movement(1, [forward, 0, 0])
-            self.leg_movement(1, [0, 0, -4])
+            self.leg_movement(1, [0, 0, -6])
             self.body_compensation_for_a_leg(2)
             self.leg_movement(2, [0, 0, up])
             self.leg_movement(2, [forward, 0, 0])
-            self.leg_movement(2, [0, 0, -4])
+            self.leg_movement(2, [0, 0, -6])
             self.body_to_center()
         elif command == 'climb_10-2':
             forward = 5
-            up = 14
+            up = 16
             self.body_movement(forward, 0, 0)
             self.body_compensation_for_a_leg(3, 5)
             self.leg_movement(3, [0, 0, up])
             self.leg_movement(3, [forward, 0, 0])
-            self.leg_movement(3, [0, 0, -4])
+            self.leg_movement(3, [0, 0, -6])
             self.body_compensation_for_a_leg(4, 5)
             self.leg_movement(4, [0, 0, up])
             self.leg_movement(4, [forward, 0, 0])
-            self.leg_movement(4, [0, 0, -4])
+            self.leg_movement(4, [0, 0, -6])
             self.body_to_center()
             #self.body_movement(0, 0, -8)
         elif command == 'reposition_x_up':
