@@ -131,7 +131,7 @@ class DeviantServos:
                 self.get_board_by_id(id).motor_or_servo(id, 1, 0)
 
     def process_motors_command(self, command, speed):
-        if command in ('forward', 'backwards'):
+        if command in ('forward', 'backwards', 'forward_4'):
             self.wheels_direction = WheelsDirection.FORWARD
         elif command in ('turn', 'turn_ccw'):
             self.wheels_direction = WheelsDirection.TURN
@@ -144,11 +144,12 @@ class DeviantServos:
         if command in ['backwards', 'turn_ccw']:
             speed = -speed
 
-        #if command in ['turn', 'turn_ccw']:
-        #    self.send_command_to_motors([speed, speed, speed, speed])
-        #else:    
-        #self.send_command_to_motors([0.8*speed, speed, 0.8*speed, 0.6*speed])
-        self.send_command_to_motors([speed, speed, speed, speed])
+        if command in ['turn', 'turn_ccw']:
+            self.send_command_to_motors([speed, speed, speed, speed])
+        elif command == 'forward_4':
+            self.send_command_to_motors([speed, -speed, -speed, speed], 4)
+        else:
+            self.send_command_to_motors([speed, -speed, -speed, speed])
 
     def lock_motors(self):
         if self.motors_locked:
