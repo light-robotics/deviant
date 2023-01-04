@@ -38,8 +38,8 @@ angles = {
 
 start = {
     "vertical"                 : 15,
-    "horizontal_x"             : 14,
-    "horizontal_y"             : 14,
+    "horizontal_x"             : 10,
+    "horizontal_y"             : 18,
     "x_offset_body"            : 0.5,
     "initial_z_position_delta" : 5, # 3
 }
