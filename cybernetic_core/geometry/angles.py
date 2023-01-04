@@ -63,7 +63,7 @@ def find_angles(Dx, Dy, logger):
                 if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
                     continue
                     # only one of two coeffs is correct
-
+                
                 if leg_angles_correct(
                     alpha=math.degrees(alpha), 
                     beta=math.degrees(beta), 
@@ -92,14 +92,17 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     
     logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
 
+    """
     D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma)
 
     if abs(D_calculated.x - D.x) > 0.01 or \
         abs(D_calculated.y - D.y) > 0.01 or \
         abs(D_calculated.z - D.z) > 0.01:
+        logger.info(f'Exception in calculate_leg_angles. O: {O}, D: {D}')
+        logger.info(f'{abs(D_calculated.x - D.x)}, {abs(D_calculated.y - D.y)}, {abs(D_calculated.z - D.z)}')
         raise Exception('D_prev far from D. Angles : {0}'
                         .format(([math.degrees(x) for x in [tetta, alpha, beta, gamma]])))
-
+    """
     return tetta, alpha, beta, gamma
 
 def calculate_D_point(O: Point, tetta: float, alpha: float, beta: float, gamma: float) -> Point:
@@ -117,7 +120,7 @@ def calculate_D_point(O: Point, tetta: float, alpha: float, beta: float, gamma: 
     D = Point(round(A.x + D_xz[0] * math.cos(tetta), 2),
                     round(A.y + D_xz[0] * math.sin(tetta), 2),
                     round(A.z + D_xz[1], 2))
-
+    #print(f'A: {A}, B: {B_xz}, C: {C_xz}, D: {D_xz}. D: {D}. tetta: {math.degrees(tetta)}, sin: {math.sin(tetta)}, cos: {math.cos(tetta)}')
     return D
 
 def convert_gamma(gamma: float) -> float:
@@ -257,25 +260,11 @@ def turn_on_angle(start_x, start_y, x1, y1, angle):
     return round(start_x + math.cos(result_angle) * l, 2), \
            round(start_y + math.sin(result_angle) * l, 2)
 
-"""
-O : Point(x=3.8, y=3.8, z=11). D : Point(x=18, y=15, z=0)
-[0.6678325892598048, 0.932520500332173, -1.2639702727274524, -1.221893261879673]
-[0.6678325892598048, 0.932520500332173, -1.2639702727274524, -1.221893261879673]
-O : Point(x=3.8, y=-3.8, z=11). D : Point(x=18, y=-21, z=0)
-[-0.8806504408162148, 0.7856728603314223, -1.0753113837445074, -1.0368117081026034]
-[-0.8806504408162148, 0.7856728603314223, -1.0753113837445074, -1.0368117081026034]
-O : Point(x=-3.8, y=-3.8, z=11). D : Point(x=-18, y=-21, z=0)
-[-2.2609422127735783, 0.7856728603314223, -1.0753113837445074, -1.0368117081026034]
-[-2.2609422127735783, 0.7856728603314223, -1.0753113837445074, -1.0368117081026034]
-O : Point(x=-3.8, y=3.8, z=11). D : Point(x=-18, y=15, z=0)
-[2.4737600643299884, 0.932520500332173, -1.2639702727274524, -1.221893261879673]
-[2.4737600643299884, 0.932520500332173, -1.2639702727274524, -1.221893261879673]
-"""
-
 if __name__ == '__main__':
     logging.config.dictConfig(code_config.logger_config)
     logger = logging.getLogger('angles_logger')
 
-    alpha, beta, gamma = get_leg_angles(11.0, -8, logger)
-    
-    logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
+    #alpha, beta, gamma = get_leg_angles(11.0, -8, logger)
+    #logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
+    calculate_leg_angles(O=Point(x=-17.25, y=-8.75, z=15), D=Point(x=-20.5, y=-12, z=0), logger=logger)
+

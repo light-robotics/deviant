@@ -73,22 +73,41 @@ class VirtualDeviant(DeviantKinematics):
             self.body_movement(0, 0, -UP_OR_DOWN_CM)
         elif command == 'down_10':
             self.body_movement(0, 0, -10)
-        elif command == 'climb_10':
-            forward = 11
-            up = 16
-            self.body_movement(0, 0, 8)
+        elif command == 'back_triangle_reposition':
+            self.body_compensation_for_a_leg(3)
+            self.leg_movement(3, [0, 0, 6])
+            self.leg_movement(3, [-10, -6, 0])
+            self.leg_movement(3, [0, 0, -6])
+            self.body_compensation_for_a_leg(4)
+            self.leg_movement(4, [0, 0, 6])
+            self.leg_movement(4, [-10, 6, 0])
+            self.leg_movement(4, [0, 0, -6])
+            self.body_to_center()
+        elif command == 'climb_12':
+            self.body_compensation_for_a_leg(3)
+            self.leg_movement(3, [0, 0, 6])
+            self.leg_movement(3, [-10, 6, 0])
+            self.leg_movement(3, [0, 0, -6])
+            self.body_compensation_for_a_leg(4)
+            self.leg_movement(4, [0, 0, 6])
+            self.leg_movement(4, [-10, -6, 0])
+            self.leg_movement(4, [0, 0, -6])
+            self.body_to_center()
+            forward = 13
+            up = 18
+            self.body_movement(0, 0, 5)
             self.body_compensation_for_a_leg(1)
             self.leg_movement(1, [0, 0, up])
-            self.leg_movement(1, [forward, 0, 0])
+            self.leg_movement(1, [forward, -11, 0])
             self.leg_movement(1, [0, 0, -6])
             self.body_compensation_for_a_leg(2)
-            self.leg_movement(2, [0, 0, up])
-            self.leg_movement(2, [forward, 0, 0])
+            self.leg_movement(2, [8, 8, up])
+            self.leg_movement(2, [forward-8, 3, 0])
             self.leg_movement(2, [0, 0, -6])
             self.body_to_center()
-        elif command == 'climb_10-2':
-            forward = 5
-            up = 16
+        elif command == 'climb_12-2':
+            forward = 13
+            up = 18
             self.body_movement(forward, 0, 0)
             self.body_compensation_for_a_leg(3, 5)
             self.leg_movement(3, [0, 0, up])
