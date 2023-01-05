@@ -84,14 +84,8 @@ class VirtualDeviant(DeviantKinematics):
             self.leg_movement(4, [0, 0, -6])
             self.body_to_center()
         elif command == 'climb_12':
-            self.body_compensation_for_a_leg(3)
-            self.leg_movement(3, [0, 0, 6])
-            self.leg_movement(3, [-10, 6, 0])
-            self.leg_movement(3, [0, 0, -6])
-            self.body_compensation_for_a_leg(4)
-            self.leg_movement(4, [0, 0, 6])
-            self.leg_movement(4, [-10, -6, 0])
-            self.leg_movement(4, [0, 0, -6])
+            self.leg_move_with_compensation(3, -10, 6)
+            self.leg_move_with_compensation(4, -10, -6)
             self.body_to_center()
             forward = 13
             up = 18
