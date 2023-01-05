@@ -11,36 +11,85 @@ if __name__ == '__main__':
     m4 = LX16A(Port='/dev/ttyAMA1') # 19-24
     
     read_all_servos(m1, m2, m3, m4)
+    
+    side = False
+    tetta_0 = True
+    alpha_45 = True
+    beta_90 = True
 
-    """
     position_rate = 3000
-    time.sleep(5)
+    #time.sleep(5)
+    m1.move_servo_to_angle(id=2, angle=0, rate=position_rate)
+    m1.move_servo_to_angle(id=3, angle=-90, rate=position_rate)
+    if beta_90:
+        m1.move_servo_to_angle(id=4, angle=90, rate=position_rate)
+    else:
+        m1.move_servo_to_angle(id=4, angle=45, rate=position_rate)
+    if alpha_45:
+        m1.move_servo_to_angle(id=5, angle=-45, rate=position_rate)
+    else:
+        m1.move_servo_to_angle(id=5, angle=-90, rate=position_rate)
 
-    m1.move_servo_to_angle(id=2, angle=45, rate=position_rate)
-    m1.move_servo_to_angle(id=3, angle=-45, rate=position_rate)
-    m1.move_servo_to_angle(id=4, angle=90, rate=position_rate)
-    m1.move_servo_to_angle(id=5, angle=-45, rate=position_rate)
-    m1.move_servo_to_angle(id=6, angle=0, rate=position_rate)
+    if tetta_0:
+        m1.move_servo_to_angle(id=6, angle=0, rate=position_rate)
+    elif side:
+        m1.move_servo_to_angle(id=6, angle=30, rate=position_rate)
+    else:
+        m1.move_servo_to_angle(id=6, angle=-37, rate=position_rate)
 
-    m2.move_servo_to_angle(id=8, angle=-45, rate=position_rate)
-    m2.move_servo_to_angle(id=9, angle=-45, rate=position_rate)
-    m2.move_servo_to_angle(id=10, angle=90, rate=position_rate)
-    m2.move_servo_to_angle(id=11, angle=-45, rate=position_rate)
-    m2.move_servo_to_angle(id=12, angle=0, rate=position_rate)
 
-    m3.move_servo_to_angle(id=14, angle=45, rate=position_rate)
-    m3.move_servo_to_angle(id=15, angle=-45, rate=position_rate)
-    m3.move_servo_to_angle(id=16, angle=90, rate=position_rate)
-    m3.move_servo_to_angle(id=17, angle=-45, rate=position_rate)
-    m3.move_servo_to_angle(id=18, angle=0, rate=position_rate)
+    m2.move_servo_to_angle(id=8, angle=0, rate=position_rate)
+    m2.move_servo_to_angle(id=9, angle=-90, rate=position_rate)
+    if beta_90:
+        m2.move_servo_to_angle(id=10, angle=90, rate=position_rate)
+    else:
+        m2.move_servo_to_angle(id=10, angle=45, rate=position_rate)
+    if alpha_45:
+        m2.move_servo_to_angle(id=11, angle=-45, rate=position_rate)
+    else:
+        m2.move_servo_to_angle(id=11, angle=-90, rate=position_rate)
+    if tetta_0:
+        m2.move_servo_to_angle(id=12, angle=0, rate=position_rate)
+    elif side:
+        m2.move_servo_to_angle(id=12, angle=-30, rate=position_rate)
+    else:
+        m2.move_servo_to_angle(id=12, angle=37, rate=position_rate)
 
-    m4.move_servo_to_angle(id=20, angle=-45, rate=position_rate)
-    m4.move_servo_to_angle(id=21, angle=-45, rate=position_rate)
-    m4.move_servo_to_angle(id=22, angle=90, rate=position_rate)
-    m4.move_servo_to_angle(id=23, angle=-45, rate=position_rate)
-    m4.move_servo_to_angle(id=24, angle=0, rate=position_rate)
+    m3.move_servo_to_angle(id=14, angle=0, rate=position_rate)
+    m3.move_servo_to_angle(id=15, angle=-90, rate=position_rate)
+    if beta_90:
+        m3.move_servo_to_angle(id=16, angle=90, rate=position_rate)
+    else:
+        m3.move_servo_to_angle(id=16, angle=45, rate=position_rate)
+    if alpha_45:
+        m3.move_servo_to_angle(id=17, angle=-45, rate=position_rate)
+    else:
+        m3.move_servo_to_angle(id=17, angle=-90, rate=position_rate)
+    if tetta_0:
+        m3.move_servo_to_angle(id=18, angle=0, rate=position_rate)
+    elif side:
+        m3.move_servo_to_angle(id=18, angle=30, rate=position_rate)
+    else:
+        m3.move_servo_to_angle(id=18, angle=-37, rate=position_rate)
+
+    m4.move_servo_to_angle(id=20, angle=0, rate=position_rate)
+    m4.move_servo_to_angle(id=21, angle=-90, rate=position_rate)
+    if beta_90:
+        m4.move_servo_to_angle(id=22, angle=90, rate=position_rate)
+    else:
+        m4.move_servo_to_angle(id=22, angle=45, rate=position_rate)
+    if alpha_45:
+        m4.move_servo_to_angle(id=23, angle=-45, rate=position_rate)
+    else:
+        m4.move_servo_to_angle(id=23, angle=-90, rate=position_rate)
+    if tetta_0:
+        m4.move_servo_to_angle(id=24, angle=0, rate=position_rate)
+    elif side:
+        m4.move_servo_to_angle(id=24, angle=-30, rate=position_rate)
+    else:
+        m4.move_servo_to_angle(id=24, angle=37, rate=position_rate)
     
-    
+    """
     time.sleep(1)
     m1.motor_or_servo(1, 1, 1000)
     m2.motor_or_servo(7, 1, -1000)
