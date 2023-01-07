@@ -2,7 +2,7 @@ leg = {
     "a": 6.9,    # PointA to PointB - femur
     "b": 8.6,    # PointB to PointC - femur-tibia
     "c": 13.9,   # PointC to PointD - tibia / point toe length
-    "d": 6.0,    # PointO to PointA - trochanter-coxa
+    "d": 7.0,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 3.8,
     "phi_angle" : 14.1 # angle correction for the wheel block
 }
@@ -16,7 +16,7 @@ angles = {
     },
     "alpha": {
         "min": -60,
-        "max": 73,
+        "max": 83,
     },
     "beta": {
         "min": -125,
@@ -38,13 +38,13 @@ angles = {
 
 start = {
     "vertical"                 : 15,
-    "horizontal_x"             : 10,
-    "horizontal_y"             : 18,
+    "horizontal_x"             : 15,
+    "horizontal_y"             : 15,
     "x_offset_body"            : 0.5,
     "initial_z_position_delta" : 5, # 3
 }
 
-margin = 7
+margin = 5
 
 leg_up = {
     1: 6,

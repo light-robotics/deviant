@@ -146,8 +146,8 @@ class DeviantServos:
 
         if command in ['turn', 'turn_ccw']:
             self.send_command_to_motors([speed, speed, speed, speed])
-        elif command == 'forward_4':
-            self.send_command_to_motors([speed, -speed, -speed, speed], 4)
+        elif command == 'forward_2':
+            self.send_command_to_motors([speed, -speed, -speed, speed], 2)
         else:
             self.send_command_to_motors([speed, -speed, -speed, speed])
 
