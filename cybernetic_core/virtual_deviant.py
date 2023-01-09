@@ -70,12 +70,12 @@ class VirtualDeviant(DeviantKinematics):
         elif command == 'up_down':
             self.body_movement(0, 0, UP_OR_DOWN_CM)
             self.body_movement(0, 0, -UP_OR_DOWN_CM)
-        elif command == 'up_10':
-            self.body_movement(0, 0, 10)
+        elif command == 'up_13':
+            self.body_movement(0, 0, 13)
         elif command == 'down':
             self.body_movement(0, 0, -UP_OR_DOWN_CM)
-        elif command == 'down_10':
-            self.body_movement(0, 0, -10)
+        elif command == 'down_13':
+            self.body_movement(0, 0, -13)
         elif command == 'back_triangle_reposition':
             self.body_compensation_for_a_leg(3)
             self.leg_movement(3, [0, 0, 6])

@@ -138,6 +138,9 @@ class DeviantServos:
         elif command in ('walking'):
             self.wheels_direction = WheelsDirection.WALK
             speed = 0
+        else:
+            print(f'Unknown command {command}')
+            return
         if abs(speed) > 0:
             self.motors_locked = False
 

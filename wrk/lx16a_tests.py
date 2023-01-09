@@ -35,7 +35,7 @@ if __name__ == '__main__':
     m3.move_servo_to_angle(id=18, angle=0, rate=position_rate)
     m4.move_servo_to_angle(id=24, angle=0, rate=position_rate)
     """
-    
+    """
     if delta_0:
         m1.move_servo_to_angle(id=2, angle=0, rate=position_rate)
     elif delta_60:
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     else:
         m4.move_servo_to_angle(id=24, angle=37, rate=position_rate)
     
-    
+    """
 
     """
     time.sleep(1)
