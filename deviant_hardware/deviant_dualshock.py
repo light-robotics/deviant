@@ -12,7 +12,7 @@ import configs.config as cfg
 class DeviantModes(Enum):
     WALKING = 1
     RUN     = 2
-    SENTRY  = 3
+    TURN    = 3
     BATTLE  = 4
 
 class DeviantDualShock(DualShock):
@@ -114,90 +114,83 @@ class DeviantDualShock(DualShock):
             return 250
         """
         return 1000
+
+    @staticmethod
+    def convert_value_to_wheels_speed(value):
+        """
+        max_speed = 1000, min_speed = 250
+        abs(value) from 0 to 32768
+        """
+        
+        value = abs(value)
+        if value < 12000:
+            return 250 # > 1000 will be ignored for moving
+        if value < 20000:
+            return 400
+        if value < 25000:
+            return 600
+        if value < 30000:
+            return 800
+
+        return 1000
     
     def on_L3_up(self, value):
-        if self.mode == DeviantModes.RUN:
-            self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
-        elif self.mode == DeviantModes.WALKING:
-            self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('body_forward', 1000)
+        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
+            self.command_writer.write_wheels_command('forward', self.convert_value_to_wheels_speed(value))
+        elif self.mode == DeviantModes.TURN:
+            self.command_writer.write_wheels_command('turn', self.convert_value_to_wheels_speed(value))
         elif self.mode == DeviantModes.BATTLE:
-            self.command_writer.write_command('hit_4', cfg.speed["hit"])
+            pass
     
     def on_L3_down(self, value):
-        if self.mode == DeviantModes.RUN:
-            self.command_writer.write_command('backward_two_legged', cfg.speed["run"])
-        elif self.mode == DeviantModes.WALKING:
-            self.command_writer.write_command('backward_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('body_backward', 1000)
+        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
+            self.command_writer.write_wheels_command('backwards', self.convert_value_to_wheels_speed(value))
+        elif self.mode == DeviantModes.TURN:
+            self.command_writer.write_wheels_command('turn_ccw', self.convert_value_to_wheels_speed(value))
 
     def on_L3_left(self, value):
-        if self.mode == DeviantModes.RUN:
-            self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
-        elif self.mode == DeviantModes.WALKING:
-            self.command_writer.write_command('strafe_left_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('body_left', 1000)
+        pass
 
     def on_L3_right(self, value):
-        if self.mode == DeviantModes.RUN:
-            self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
-        elif self.mode == DeviantModes.WALKING:
-            self.command_writer.write_command('strafe_right_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('body_right', 1000)
+        pass
     
     def on_L3_press(self):
-        #if self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('body_to_center', 1000)
+        pass
     
     def on_L3_y_at_rest(self):
         self.command_writer.write_command('none', 250)
+        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
+            self.command_writer.write_wheels_command('forward', 0)
+        elif self.mode == DeviantModes.TURN:
+            self.command_writer.write_wheels_command('turn', 0)
 
     def on_L3_x_at_rest(self):
         self.command_writer.write_command('none', 250)
+        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
+            self.command_writer.write_wheels_command('forward', 0)
+        if self.mode == DeviantModes.TURN:
+            self.command_writer.write_wheels_command('turn', 0)
     
     def on_R3_up(self, value):
-        if self.mode in [DeviantModes.WALKING, DeviantModes.RUN]:
-            self.command_writer.write_wheels_command('forward', 1000)
-        if self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('look_up', 1000)
-        elif self.mode == DeviantModes.BATTLE:
-            self.command_writer.write_command('hit_1', cfg.speed["hit"])
+        pass
     
     def on_R3_down(self, value):
-        if self.mode in [DeviantModes.WALKING, DeviantModes.RUN]:
-            self.command_writer.write_wheels_command('backward', 1000)
-        if self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('look_down', 1000)
+        pass
     
     def on_R3_left(self, value):
-        return
-        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
-            self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
-        elif self.mode in [DeviantModes.SENTRY, DeviantModes.BATTLE]:
-            self.command_writer.write_command('look_left', 1000)
+        pass
     
     def on_R3_right(self, value):
-        return
-        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
-            self.command_writer.write_command('turn_right_two_legged', self.convert_value_to_speed(value))
-        elif self.mode in [DeviantModes.SENTRY, DeviantModes.BATTLE]:
-            self.command_writer.write_command('look_right', 1000)
+        pass
 
     def on_R3_press(self):
-        if self.mode == DeviantModes.SENTRY:
-            self.command_writer.write_command('sight_to_normal', 1000)
+        pass
     
     def on_R3_y_at_rest(self):
-        #self.command_writer.write_command('none', 250)
-        self.command_writer.write_wheels_command('forward', 0)
+        pass
     
     def on_R3_x_at_rest(self):
-        #self.command_writer.write_command('none', 250)
-        self.command_writer.write_wheels_command('forward', 0)
+        pass
 
     def on_right_arrow_press(self):
         pass
@@ -206,16 +199,16 @@ class DeviantDualShock(DualShock):
         pass
       
     def on_up_arrow_press(self):
-        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING, DeviantModes.SENTRY]:
+        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
             self.command_writer.write_command('up', 1000)
-        elif self.mode == DeviantModes.BATTLE:
-            self.command_writer.write_command('nano_demo_1', 1000)
+        elif self.mode == DeviantModes.TURN:
+            self.command_writer.write_command('up_6', 1000)
 
     def on_down_arrow_press(self):
-        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING, DeviantModes.SENTRY]:
+        if self.mode in [DeviantModes.RUN, DeviantModes.WALKING]:
             self.command_writer.write_command('down', 1000)
-        elif self.mode == DeviantModes.BATTLE:
-            self.command_writer.write_command('nano_demo_2', 1000)
+        elif self.mode == DeviantModes.TURN:
+            self.command_writer.write_command('down_6', 1000)
 
     def on_up_down_arrow_release(self):
         self.command_writer.write_command('none', 500)
@@ -223,25 +216,27 @@ class DeviantDualShock(DualShock):
     def on_x_press(self):
         self.mode = DeviantModes.BATTLE
         self.neopixel.issue_command('steady', color='purple')
-        self.command_writer.write_command('battle_mode', 1000)
         print('Switched mode to BATTLE')
 
     def on_triangle_press(self):
         self.mode = DeviantModes.RUN
-        self.neopixel.issue_command('steady', color='red')
-        self.command_writer.write_command('run_mode', 1000)
+        self.neopixel.issue_command('steady', color='cyan')
+        self.command_writer.write_wheels_command('forward', 0)
+        self.command_writer.write_command('up_down', 300)
         print('Switched mode to RUN')
 
     def on_circle_press(self):
-        self.mode = DeviantModes.SENTRY
-        self.neopixel.issue_command('steady', color='cyan')
-        self.command_writer.write_command('sentry_mode', 1000)
-        print('Switched mode to SENTRY')
+        self.mode = DeviantModes.TURN
+        self.neopixel.issue_command('steady', color='green')
+        self.command_writer.write_wheels_command('turn', 0)
+        self.command_writer.write_command('up_down', 300)
+        print('Switched mode to TURN')
 
     def on_square_press(self):
         self.mode = DeviantModes.WALKING
-        self.neopixel.issue_command('steady', color='blue')
-        self.command_writer.write_command('one_legged_mode', 1000)
+        self.neopixel.issue_command('steady', color='blue')    
+        self.command_writer.write_wheels_command('forward', 0)
+        self.command_writer.write_command('up_down', 300)
         print('Switched mode to WALKING')
 
 if __name__ == '__main__':

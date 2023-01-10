@@ -25,7 +25,7 @@ class CommandsWriter:
         self.command_id = 1
 
     def write_command(self, command: str, speed: int) -> None:
-        if speed > 1000:
+        if speed > 3000:
             print(f'Ignoring command {command}, {speed}')
         else:
             print(f'writing {command}, {speed} to command file')
