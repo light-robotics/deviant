@@ -324,7 +324,28 @@ class DeviantKinematics:
         for leg in [self.legs[2], self.legs[4]]:
             leg.move_end_point(0, 0, -k_cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')      
-    
+
+    def reposition_legs(self, delta_x, delta_y):
+        self.logger.info(f'reposition_legs ({delta_x}, {delta_y})')
+        if delta_x == delta_y == 0:
+            return None
+
+        self.legs[2].move_end_point(delta_x, -delta_y, k_cfg.leg_up[1])
+        self.legs[4].move_end_point(-delta_x, delta_y, k_cfg.leg_up[1])
+        self.add_angles_snapshot('endpoints')
+
+        self.legs[2].move_end_point(0, 0, -k_cfg.leg_up[1])
+        self.legs[4].move_end_point(0, 0, -k_cfg.leg_up[1])
+        self.add_angles_snapshot('endpoints')
+
+        self.legs[1].move_end_point(delta_x, delta_y, k_cfg.leg_up[1])
+        self.legs[3].move_end_point(-delta_x, -delta_y, k_cfg.leg_up[1])
+        self.add_angles_snapshot('endpoints')
+
+        self.legs[1].move_end_point(0, 0, -k_cfg.leg_up[1])
+        self.legs[3].move_end_point(0, 0, -k_cfg.leg_up[1])
+        self.add_angles_snapshot('endpoints')
+
 
 if __name__ == '__main__':
     fk = DeviantKinematics()

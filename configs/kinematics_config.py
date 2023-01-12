@@ -40,7 +40,7 @@ start = {
     "vertical"                 : 14,
     "horizontal_x"             : 15,
     "horizontal_y"             : 15,
-    "x_offset_body"            : 0.5,
+    "x_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
 

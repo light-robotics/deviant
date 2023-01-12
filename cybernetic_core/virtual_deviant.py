@@ -117,14 +117,10 @@ class VirtualDeviant(DeviantKinematics):
             self.leg_movement(4, [0, 0, -6])
             self.body_to_center()
             #self.body_movement(0, 0, -8)
-        elif command == 'reposition_x_up':
-            self.reposition_legs(REPOSITION_CM, 0)
-        elif command == 'reposition_x_down':
-            self.reposition_legs(-REPOSITION_CM, 0)
-        elif command == 'reposition_y_up':
-            self.reposition_legs(0, REPOSITION_CM)
-        elif command == 'reposition_y_down':
-            self.reposition_legs(0, -REPOSITION_CM)
+        elif command == 'reposition_wider':
+            self.reposition_legs(-10, 10)
+        elif command == 'reposition_narrower':
+            self.reposition_legs(10, -10)
         elif command == 'start':
             self.start()
         elif command == 'end':

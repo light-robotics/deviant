@@ -29,6 +29,8 @@ if __name__ == '__main__':
         delta_60 = False
 
     position_rate = 3000
+    
+
     """
     m1.move_servo_to_angle(id=6, angle=0, rate=position_rate)
     m2.move_servo_to_angle(id=12, angle=0, rate=position_rate)
