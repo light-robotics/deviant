@@ -131,6 +131,8 @@ class VirtualDeviant(DeviantKinematics):
             self.end()
         elif command == 'reset':
             self.reset()
+        elif command == 'actualize_wheels':
+            self.actualize_wheels()
         else:
             print(f'Unknown command')
         

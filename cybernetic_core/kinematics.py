@@ -138,6 +138,10 @@ class DeviantKinematics:
 
         return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
 
+    def actualize_wheels(self):
+        # method to adapt wheels position to current servos and changed mode
+        self.add_angles_snapshot('endpoint')
+
     ################## MOVEMENTS START HERE ##################
     def leg_movement(self, leg_num, leg_delta):
         self.logger.info(f'Move. Leg {leg_num} for {leg_delta}')

@@ -222,21 +222,21 @@ class DeviantDualShock(DualShock):
         self.mode = DeviantModes.RUN
         self.neopixel.issue_command('steady', color='cyan')
         self.command_writer.write_wheels_command('forward', 0)
-        self.command_writer.write_command('up_down', 300)
+        self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to RUN')
 
     def on_circle_press(self):
         self.mode = DeviantModes.TURN
         self.neopixel.issue_command('steady', color='green')
         self.command_writer.write_wheels_command('turn', 0)
-        self.command_writer.write_command('up_down', 300)
+        self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to TURN')
 
     def on_square_press(self):
         self.mode = DeviantModes.WALKING
         self.neopixel.issue_command('steady', color='blue')    
         self.command_writer.write_wheels_command('forward', 0)
-        self.command_writer.write_command('up_down', 300)
+        self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to WALKING')
 
 if __name__ == '__main__':
