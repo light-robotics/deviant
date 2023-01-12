@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from cybernetic_core.geometry.angles import calculate_leg_angles, calculate_D_point, turn_on_angle, convert_legs_angles, convert_legs_angles_back
 from cybernetic_core.geometry.lines import Point, LinearFunc, calculate_intersection, move_on_a_line
 import configs.code_config as code_config
-import configs.kinematics_config as k_cfg
+import configs.kinematics_config as cfg
 import logging.config
 from cybernetic_core.cybernetic_utils.moves import Move, MoveSnapshot
 
@@ -36,21 +36,24 @@ class Leg:
         self.update_angles()
 
 class DeviantKinematics:
-    def __init__(self):
+    def __init__(self, 
+                 legs_offset_v=cfg.start['vertical'],
+                 legs_offset_h_x=cfg.start['horizontal_x'],
+                 legs_offset_h_y=cfg.start['horizontal_y']):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('main_logger')
 
-        self.legs_offset_v = k_cfg.start['vertical']
-        self.legs_offset_h_x = k_cfg.start['horizontal_x']
-        self.legs_offset_h_y = k_cfg.start['horizontal_y']
+        self.legs_offset_v = legs_offset_v
+        self.legs_offset_h_x = legs_offset_h_x
+        self.legs_offset_h_y = legs_offset_h_y
         self.legs = self.initiate_legs()
             
-        print(f"""
-            Kinematics created with 
-            v = {self.legs_offset_v}, 
-            h_x = {self.legs_offset_h_x},
-            h_y = {self.legs_offset_h_y}
-            """)
+        #print(f"""
+        #    Kinematics created with 
+        #    v = {self.legs_offset_v}, 
+        #    h_x = {self.legs_offset_h_x},
+        #    h_y = {self.legs_offset_h_y}
+        #    """)
         
         self.angles_history = []
         self.add_angles_snapshot('init')
@@ -98,37 +101,37 @@ class DeviantKinematics:
         return self.angles_history[-1].angles_snapshot
 
     def initiate_legs(self):
-        O1 = Point(k_cfg.leg["mount_point_offset"],
-                   k_cfg.leg["mount_point_offset"],
+        O1 = Point(cfg.leg["mount_point_offset"],
+                   cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D1 = Point(self.legs_offset_h_x - k_cfg.start["x_offset_body"],
+        D1 = Point(self.legs_offset_h_x - cfg.start["x_offset_body"],
                    self.legs_offset_h_y,
                    0)
         self.logger.info('[Init] Initiating leg 1')
         Leg1 = Leg(O1, D1)
 
-        O2 = Point(k_cfg.leg["mount_point_offset"],
-                   -k_cfg.leg["mount_point_offset"],
+        O2 = Point(cfg.leg["mount_point_offset"],
+                   -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D2 = Point(self.legs_offset_h_x - k_cfg.start["x_offset_body"],
+        D2 = Point(self.legs_offset_h_x - cfg.start["x_offset_body"],
                    -self.legs_offset_h_y,
                    0)
         self.logger.info('[Init] Initiating leg 2')
         Leg2 = Leg(O2, D2)
 
-        O3 = Point(-k_cfg.leg["mount_point_offset"],
-                   -k_cfg.leg["mount_point_offset"],
+        O3 = Point(-cfg.leg["mount_point_offset"],
+                   -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D3 = Point(-self.legs_offset_h_x - k_cfg.start["x_offset_body"],
+        D3 = Point(-self.legs_offset_h_x - cfg.start["x_offset_body"],
                    -self.legs_offset_h_y,
                    0)
         self.logger.info('[Init] Initiating leg 3')
         Leg3 = Leg(O3, D3)
 
-        O4 = Point(-k_cfg.leg["mount_point_offset"],
-                   k_cfg.leg["mount_point_offset"],
+        O4 = Point(-cfg.leg["mount_point_offset"],
+                   cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D4 = Point(-self.legs_offset_h_x - k_cfg.start["x_offset_body"],
+        D4 = Point(-self.legs_offset_h_x - cfg.start["x_offset_body"],
                    self.legs_offset_h_y,
                    0)
         self.logger.info('[Init] Initiating leg 4')
@@ -164,24 +167,24 @@ class DeviantKinematics:
 
     # ?
     def start(self):
-        self.body_movement(0, 0, -k_cfg.start["vertical"] + k_cfg.start["initial_z_position_delta"])
-        self.body_movement(0, 0, k_cfg.start["vertical"] - k_cfg.start["initial_z_position_delta"])
+        self.body_movement(0, 0, -cfg.start["vertical"] + cfg.start["initial_z_position_delta"])
+        self.body_movement(0, 0, cfg.start["vertical"] - cfg.start["initial_z_position_delta"])
     
     # ?
     def reset(self):
         self.logger.info('Processing reset command')
         self.body_to_center()
-        delta_z = self.legs[1].O.z - self.legs[1].D.z - k_cfg.start["vertical"]
+        delta_z = self.legs[1].O.z - self.legs[1].D.z - cfg.start["vertical"]
         self.body_movement(0, 0, -delta_z)
 
     # ?
     def end(self):
         self.reset()
-        self.body_movement(0, 0, -k_cfg.start["vertical"] + 
-                                  k_cfg.start["initial_z_position_delta"])
+        self.body_movement(0, 0, -cfg.start["vertical"] + 
+                                  cfg.start["initial_z_position_delta"])
             
 
-    def body_delta_xy(self, delta_y=0, delta_x=k_cfg.start["x_offset_body"]):
+    def body_delta_xy(self, delta_y=0, delta_x=cfg.start["x_offset_body"]):
         # move body to center
         avg_o_x, avg_o_y, avg_d_x, avg_d_y = 0, 0, 0, 0
         for leg in self.legs.values():
@@ -199,7 +202,7 @@ class DeviantKinematics:
                 round(avg_o_y - avg_d_y - delta_y, 2)]
                            
 
-    def body_to_center(self, delta_y=0, delta_x=k_cfg.start["x_offset_body"]):
+    def body_to_center(self, delta_y=0, delta_x=cfg.start["x_offset_body"]):
         # move body to center
         
         body_delta_xy = self.body_delta_xy(delta_y, delta_x)
@@ -209,7 +212,7 @@ class DeviantKinematics:
                            0)
 
     # body compensation for moving up one leg
-    def target_body_position(self, leg_in_the_air_number, margin=k_cfg.margin):
+    def target_body_position(self, leg_in_the_air_number, margin=cfg.margin):
         """
         provide the number of leg_in_the_air
         return target position of body to let the leg go into the air
@@ -229,7 +232,7 @@ class DeviantKinematics:
 
         return body_target_point
 
-    def body_compensation_for_a_leg(self, leg_num, margin=k_cfg.margin):        
+    def body_compensation_for_a_leg(self, leg_num, margin=cfg.margin):        
         target = self.target_body_position(leg_num, margin)
         self.logger.info(f'Move. body_compensation_for_a_leg {leg_num}. Target : {target}')
         current_body_x = (self.legs[1].O.x +
@@ -256,35 +259,9 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoint')
 
     def leg_move_with_compensation(self, leg_num, delta_x, delta_y):
-        self.compensated_leg_movement(leg_num, [delta_x, delta_y, k_cfg.leg_up[1]])
-        self.logger.info(f'Processing leg {leg_num} move_end_point {[0, 0, -k_cfg.leg_up[1]]}')
-        self.move_leg_endpoint(leg_num, [0, 0, -k_cfg.leg_up[1]])
-
-    def leg_move_with_compensation_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
-        self.obstacled_leg_up = k_cfg.leg_up[1] / 2
-        self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
-        if move_type == 1:
-            if obstacle_z >= 0:
-                self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.obstacled_leg_up + obstacle_z])
-            else:
-                self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
-        else:
-            if obstacle_z >= 0:
-                self.logger.info(f'Move. Trying move for [{delta_x/2, delta_y/2, self.obstacled_leg_up + obstacle_z}]')
-                self.compensated_leg_movement(leg_num, [delta_x/2, delta_y/2, self.obstacled_leg_up + obstacle_z])
-                self.logger.info('Move. Compensated leg move ok')
-                self.move_leg_endpoint(leg_num, [delta_x/2, delta_y/2, 0])
-                self.logger.info(f'Move. Endpoint for {[delta_x/2, delta_y/2, 0]} ok')
-            else:
-                self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
-
-        if obstacle_z >= 0:
-            self.logger.info(f'Move. Trying move for {-self.obstacled_leg_up}')
-            self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up])
-            self.logger.info('Move. Endpoint ok')
-        else:
-            self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up + obstacle_z])
-        #self.compensated_leg_movement(leg_num, [0, 0, -k_cfg.leg_up[2]])
+        self.compensated_leg_movement(leg_num, [delta_x, delta_y, cfg.leg_up[1]])
+        self.logger.info(f'Processing leg {leg_num} move_end_point {[0, 0, -cfg.leg_up[1]]}')
+        self.move_leg_endpoint(leg_num, [0, 0, -cfg.leg_up[1]])
 
     def move_leg_endpoint(self, leg_num, leg_delta):        
         self.legs[leg_num].move_end_point(*leg_delta)
@@ -307,22 +284,22 @@ class DeviantKinematics:
         self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
 
         for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(delta_x, delta_y, k_cfg.leg_up[2])
+            leg.move_end_point(delta_x, delta_y, cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')
 
         for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(0, 0, -k_cfg.leg_up[2])
+            leg.move_end_point(0, 0, -cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')
         
     def move_2_legs_phased_24(self, delta_x: int = 0, delta_y: int = 0) -> None:
         self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
 
         for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(delta_x, delta_y, k_cfg.leg_up[2])
+            leg.move_end_point(delta_x, delta_y, cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')
 
         for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(0, 0, -k_cfg.leg_up[2])
+            leg.move_end_point(0, 0, -cfg.leg_up[2])
         self.add_angles_snapshot('endpoints')      
 
     def reposition_legs(self, delta_x, delta_y):
@@ -330,21 +307,53 @@ class DeviantKinematics:
         if delta_x == delta_y == 0:
             return None
 
-        self.legs[2].move_end_point(delta_x, -delta_y, k_cfg.leg_up[1])
-        self.legs[4].move_end_point(-delta_x, delta_y, k_cfg.leg_up[1])
+        self.legs[2].move_end_point(delta_x, -delta_y, cfg.leg_up[1])
+        self.legs[4].move_end_point(-delta_x, delta_y, cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
 
-        self.legs[2].move_end_point(0, 0, -k_cfg.leg_up[1])
-        self.legs[4].move_end_point(0, 0, -k_cfg.leg_up[1])
+        self.legs[2].move_end_point(0, 0, -cfg.leg_up[1])
+        self.legs[4].move_end_point(0, 0, -cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
 
-        self.legs[1].move_end_point(delta_x, delta_y, k_cfg.leg_up[1])
-        self.legs[3].move_end_point(-delta_x, -delta_y, k_cfg.leg_up[1])
+        self.legs[1].move_end_point(delta_x, delta_y, cfg.leg_up[1])
+        self.legs[3].move_end_point(-delta_x, -delta_y, cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
 
-        self.legs[1].move_end_point(0, 0, -k_cfg.leg_up[1])
-        self.legs[3].move_end_point(0, 0, -k_cfg.leg_up[1])
+        self.legs[1].move_end_point(0, 0, -cfg.leg_up[1])
+        self.legs[3].move_end_point(0, 0, -cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
+
+    def leg_move_with_compensation_obstacled(self, leg_num, delta_x, delta_y, obstacle_z):
+        self.obstacled_leg_up = cfg.leg_up[1] - 2
+        self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
+        self.logger.info(f'Move. Trying move for {[0, 0, self.obstacled_leg_up + obstacle_z]}')
+        self.compensated_leg_movement(leg_num, [0, 0, self.obstacled_leg_up + obstacle_z])
+        self.logger.info(f'Move. Trying move for {[delta_x, delta_y, 0]}')
+        self.compensated_leg_movement(leg_num, [delta_x, delta_y, 0])
+
+        self.logger.info(f'Move. Trying move for {-self.obstacled_leg_up}')
+        self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up])
+        self.logger.info('Move. Endpoint ok')
+
+    def climb_obstacle(self, obstacle_z, step_len=13, narrowing_len=10, initial_body_movement_up=5):
+        print(1)
+        self.reposition_legs(10, -10)
+        print(2)
+        self.body_movement(0, 0, initial_body_movement_up)
+        print(3)
+        self.leg_move_with_compensation_obstacled(1, step_len, -narrowing_len, obstacle_z)
+        print(4)
+        self.leg_move_with_compensation_obstacled(2, step_len, narrowing_len, obstacle_z)
+        print(5)
+        self.leg_move_with_compensation(3, -step_len, -narrowing_len)
+        print(6)
+        self.leg_move_with_compensation(4, -step_len, narrowing_len)
+        print(7)
+        # here we drive forward
+        self.leg_move_with_compensation_obstacled(3, step_len, narrowing_len, obstacle_z)
+        print(8)
+        self.leg_move_with_compensation_obstacled(4, step_len, -narrowing_len, obstacle_z)
+        print(9)
 
 
 if __name__ == '__main__':
