@@ -72,51 +72,16 @@ class VirtualDeviant(DeviantKinematics):
             self.body_movement(0, 0, -1)
         elif command == 'up_6':
             self.body_movement(0, 0, 6)
+        elif command == 'up_4':
+            self.body_movement(0, 0, 4)
         elif command == 'down':
             self.body_movement(0, 0, -UP_OR_DOWN_CM)
+        elif command == 'down_4':
+            self.body_movement(0, 0, -4)
         elif command == 'down_6':
             self.body_movement(0, 0, -6)
-        elif command == 'back_triangle_reposition':
-            self.body_compensation_for_a_leg(3)
-            self.leg_movement(3, [0, 0, 6])
-            self.leg_movement(3, [-10, -6, 0])
-            self.leg_movement(3, [0, 0, -6])
-            self.body_compensation_for_a_leg(4)
-            self.leg_movement(4, [0, 0, 6])
-            self.leg_movement(4, [-10, 6, 0])
-            self.leg_movement(4, [0, 0, -6])
-            self.body_to_center()
-        elif command == 'climb_12':
-            self.body_movement(0, 0, 5)
-            self.leg_move_with_compensation(3, -10, 6)
-            self.leg_move_with_compensation(4, -10, -6)
-            self.body_to_center()
-            forward = 13
-            up = 18
-            self.body_movement(0, 0, 5)
-            self.body_compensation_for_a_leg(1)
-            self.leg_movement(1, [0, 0, up])
-            self.leg_movement(1, [forward, -11, 0])
-            self.leg_movement(1, [0, 0, -6])
-            self.body_compensation_for_a_leg(2)
-            self.leg_movement(2, [8, 8, up])
-            self.leg_movement(2, [forward-8, 3, 0])
-            self.leg_movement(2, [0, 0, -6])
-            self.body_to_center()
-        elif command == 'climb_12-2':
-            forward = 13
-            up = 18
-            self.body_movement(forward, 0, 0)
-            self.body_compensation_for_a_leg(3, 5)
-            self.leg_movement(3, [0, 0, up])
-            self.leg_movement(3, [forward, 0, 0])
-            self.leg_movement(3, [0, 0, -6])
-            self.body_compensation_for_a_leg(4, 5)
-            self.leg_movement(4, [0, 0, up])
-            self.leg_movement(4, [forward, 0, 0])
-            self.leg_movement(4, [0, 0, -6])
-            self.body_to_center()
-            #self.body_movement(0, 0, -8)
+        elif command == 'climb_12_1':
+            self.climb_obstacle()
         elif command == 'reposition_wider':
             self.reposition_legs(-10, 10)
         elif command == 'reposition_narrower':

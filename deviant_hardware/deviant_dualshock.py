@@ -200,10 +200,12 @@ class DeviantDualShock(DualShock):
             self.command_writer.write_command('reposition_narrower', 500)
       
     def on_up_arrow_press(self):
-        if self.mode in [DeviantModes.RUN, DeviantModes.CLIMBING, DeviantModes.OBSTACLES]:
+        if self.mode in [DeviantModes.RUN, DeviantModes.OBSTACLES]:
             self.command_writer.write_command('up', 1000)
         elif self.mode == DeviantModes.TURN:
             self.command_writer.write_command('up_6', 1000)
+        elif self.mode == DeviantModes.CLIMBING:
+            self.command_writer.write_command('climb_12_1', 1000)
 
     def on_down_arrow_press(self):
         if self.mode in [DeviantModes.RUN, DeviantModes.CLIMBING, DeviantModes.OBSTACLES]:

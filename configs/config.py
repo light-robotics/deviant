@@ -27,7 +27,7 @@ moves = {
     "up_or_down_cm"         : 2,
     "move_body_cm"          : 7,
     "forward_body_1_leg_cm" : 8,
-    "forward_body_2_leg_cm" : 4,    
+    "forward_body_2_leg_cm" : 6,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
     "vertical_look_angle"   : 30,
