@@ -117,10 +117,12 @@ class DeviantServos:
     def send_command_to_servos(self, angles, rate=1000):
         adapted_angles = self.adapt_delta_angle(angles)
         angles_converted = convert_kinematic_angles_to_ids(adapted_angles)
+        self.logger.info(f'DS. send_command_to_servos. {angles_converted, rate}')
         for id in self.servo_ids:
             self.get_board_by_id(id).move_servo_to_angle(id, angles_converted[id], rate)
 
     def send_command_to_motors(self, speeds: List[float] = [1000, 1000, 1000, 1000], duration: int = 0):
+        self.logger.info(f'DS. send_command_to_motors. {speeds, duration}')
         for id, speed in zip(self.motor_ids, speeds):
             self.get_board_by_id(id).motor_or_servo(id, 1, round(speed))
 

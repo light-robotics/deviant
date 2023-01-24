@@ -106,7 +106,7 @@ class LX16A:
 
     # send packet and return response
     def send_receive_packet(self, packet: bytes, receive_size: int) -> bytes:
-        num_attempts = 3
+        num_attempts = 5
         for _ in range(num_attempts):
             # t_id = packet[0]     
             # t_command = packet[2]
@@ -373,7 +373,7 @@ class LX16A:
     # Read servo position
     # the value can be negative then it is signed short
     def read_position(self, id: int) -> int:
-        num_attempts = 3
+        num_attempts = 5
         for attempt in range(num_attempts):
             try:
                 packet = struct.pack(
@@ -398,6 +398,9 @@ class LX16A:
             if -150 <= angle <= 150:
                 return angle
             self.logger.info(f'Attempt to read angle from servo {id} failed. Value : {angle}')
+            # if i > 1:
+            #     self.reset()
+            #     time.sleep(0.1)
         raise Exception(f'Could not get correct angle from servo {id} in {num_attempts} attempts.')
 
     # Motor movement with speed : motor_mode = 1 motor_speed = rate

@@ -2,7 +2,7 @@ import time
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from hardware.lx16a import LX16A, read_all_servos
+from hardware.lx16a import LX16A, read_all_servos, read_values
 
 if __name__ == '__main__':      
     m1 = LX16A(Port='/dev/ttyAMA0') # 1-6
@@ -12,6 +12,7 @@ if __name__ == '__main__':
     
     read_all_servos(m1, m2, m3, m4)
     
+    """
     tetta_0 = False
     side = True
 
@@ -29,7 +30,14 @@ if __name__ == '__main__':
         delta_60 = False
 
     position_rate = 3000
-    
+    print(f'Before: {read_values(m3, 1)}')
+    m3.move_servo_to_angle(id=1, angle=0, rate=1000)
+    time.sleep(1.0)
+    m3.move_servo_to_angle(id=1, angle=90, rate=1000)
+    time.sleep(3.0)
+    print(f'After: {read_values(m3, 1)}')
+    m3.move_servo_to_angle(id=1, angle=0, rate=1000)
+    """
 
     """
     m1.move_servo_to_angle(id=6, angle=0, rate=position_rate)

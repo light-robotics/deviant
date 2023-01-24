@@ -174,6 +174,7 @@ class MovementProcessor:
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
 
     def move(self):
+        prev_wheels_command = ''
         try:
             while True:
                 servos_command_read = self.read_servos_command()
@@ -186,12 +187,20 @@ class MovementProcessor:
                 if wheels_command_read is not None:
                     wheels_command, wheels_speed = wheels_command_read
                     if not code_config.DEBUG:
-                        self.execute_wheels_command(wheels_command, wheels_speed)
-                        if wheels_speed == 0:
-                            self.ds.lock_motors()
+                        new_wheels_command = f'{wheels_command}-{wheels_speed}'
+                        if prev_wheels_command != new_wheels_command:
+                            self.logger.info(f'Command. Wheels. {wheels_command, wheels_speed}')
+                            self.execute_wheels_command(wheels_command, wheels_speed)
+                            if wheels_speed == 0:
+                                self.logger.info('Command. Wheels. Lock motors')
+                                self.ds.lock_motors()
+                            prev_wheels_command = new_wheels_command
+                            # if servos_command_read is None:
+                            #     time.sleep(0.1)
 
                 if servos_command_read is not None:
                     servos_command, servos_speed = servos_command_read
+                    self.logger.info(f'Command. Servos. {servos_command, servos_speed}')
                     if servos_command == 'exit':
                         self.execute_wheels_command('forward', 0)
                         break
