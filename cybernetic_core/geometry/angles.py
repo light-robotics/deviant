@@ -124,11 +124,11 @@ def calculate_D_point(O: Point, tetta: float, alpha: float, beta: float, gamma: 
     return D
 
 def convert_gamma(gamma: float) -> float:
-    gamma_converted = round(math.degrees(gamma) - cfg.leg["phi_angle"], 2)
+    gamma_converted = -round(math.degrees(gamma) - cfg.leg["phi_angle"], 2)
     return gamma_converted
 
 def convert_gamma_back(gamma_converted: float) -> float:
-    gamma_initial = round(math.radians(gamma_converted + cfg.leg["phi_angle"]), 4)
+    gamma_initial = -round(math.radians(gamma_converted + cfg.leg["phi_angle"]), 4)
     return gamma_initial
 
 def convert_alpha(alpha: float) -> float:
@@ -140,11 +140,11 @@ def convert_alpha_back(alpha_converted: float) -> float:
     return alpha_initial
 
 def convert_beta(beta: float) -> float:
-    beta_converted = -round(math.degrees(beta), 2)
+    beta_converted = round(math.degrees(beta), 2)
     return beta_converted
 
 def convert_beta_back(beta_converted: float) -> float:
-    beta_initial = -round(math.radians(beta_converted), 4)
+    beta_initial = round(math.radians(beta_converted), 4)
     return beta_initial
 
 def convert_tetta(tetta: float, leg_number: int) -> float:

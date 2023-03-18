@@ -183,7 +183,7 @@ class MovementProcessor:
                 if servos_command_read is None and wheels_command_read is None:
                     time.sleep(0.1)
                     continue
-                
+
                 if wheels_command_read is not None:
                     wheels_command, wheels_speed = wheels_command_read
                     if not code_config.DEBUG:

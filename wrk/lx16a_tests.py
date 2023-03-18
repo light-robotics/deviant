@@ -10,8 +10,29 @@ if __name__ == '__main__':
     m3 = LX16A(Port='/dev/ttyAMA3') # 13-18
     m4 = LX16A(Port='/dev/ttyAMA1') # 19-24
     
-    read_all_servos(m1, m2, m3, m4)
-    
+    # 1: 3-5, 21-23
+    # 2: 9-11, 15-17
+    # 3: 1,2, 6, (7,8), 12
+    # 4: (13,14), 18, (19,20), 24
+    # read_all_servos(m1, m2, m3, m4)
+    # Moving to {'leg1_tetta': 0.0, 'leg1_alpha': -15.55, 'leg1_beta': 80.39, 'leg1_gamma': -10.15, 'leg2_tetta': 0.0, 'leg2_alpha': -15.55, 'leg2_beta': 80.39, 'leg2_gamma': -10.15, 'leg3_tetta': 0.0, 'leg3_alpha': -15.55, 'leg3_beta': 80.39, 'leg3_gamma': -10.15, 'leg4_tetta': 0.0, 'leg4_alpha': -15.55, 'leg4_beta': 80.39, 'leg4_gamma': -10.15}. Move type: body
+    #m1.move_servo_to_angle(5, -15, 1000)
+    #m1.move_servo_to_angle(4, -80, 2000)
+    #m1.move_servo_to_angle(3, 10, 1000)
+    # m1.move_servo_to_angle(21, 0, 1000)
+    #for j in range(1, 25):        
+    #    m4.read_values(j)
+    # m1.move_servo_to_angle(1, 0, 1000)
+    # m4.read_values(24)
+    # m4.move_servo_to_angle(24, 0, 1000)
+    for i in [3, 4, 5, 21, 22, 23]:
+        m1.read_values(i)
+    for i in [9, 10, 11, 15, 16, 17]:
+        m2.read_values(i)
+    for i in [1, 2, 6, 7, 8, 12]:
+        m3.read_values(i)
+    for i in [13, 14, 18, 19, 20, 24]:
+        m4.read_values(i)
     """
     tetta_0 = False
     side = True

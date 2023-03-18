@@ -79,13 +79,13 @@ class DeviantServos:
         self.motor_ids = [1, 7, 13, 19]
 
     def get_board_by_id(self, id: int) -> LX16A:
-        if 1 <= id <= 6:
+        if id in [3, 4, 5, 21, 22, 23]:
             return self.m1
-        if 7 <= id <= 12:
+        if id in [9, 10, 11, 15, 16, 17]:
             return self.m2
-        if 13 <= id <= 18:
+        if id in [1, 2, 6, 7, 8, 12]:
             return self.m3
-        if 19 <= id <= 24:
+        if id in [13, 14, 18, 19, 20, 24]:
             return self.m4
 
     def get_current_angles(self) -> Dict[int, float]:
@@ -98,20 +98,20 @@ class DeviantServos:
     def adapt_delta_angle(self, angles: Dict[str, Dict[str, float]]) -> Dict[str, Dict[str, float]]:
         adapted_angles = {**angles}
         if self.wheels_direction == WheelsDirection.FORWARD:
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 45
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 45
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 45
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 45
-        elif self.wheels_direction == WheelsDirection.SIDEWAYS:
             adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 45
             adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 45
             adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 45
             adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] + 45
+        elif self.wheels_direction == WheelsDirection.SIDEWAYS:
+            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 45
+            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 45
+            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 45
+            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 45
         elif self.wheels_direction in (WheelsDirection.TURN, WheelsDirection.WALK):
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 75
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 75
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 75
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 75
+            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 75
+            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 75
+            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 75
+            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] + 75
         return adapted_angles
 
     def send_command_to_servos(self, angles, rate=1000):
