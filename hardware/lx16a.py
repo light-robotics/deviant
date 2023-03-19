@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import configs.code_config as code_config
 import logging.config
 
-
+"""
 neutral = {
     1 : 472,
     2 : 470,
@@ -35,6 +35,33 @@ neutral = {
     22 : 505,
     23 : 513,
     24 : 515,
+}
+"""
+neutral = {
+    1 : 500,
+    2 : 481,
+    3 : 522,
+    4 : 545,
+    5 : 490,
+    6 : 492,
+    7 : 500,
+    8 : 496,
+    9 : 486,
+    10 : 508,
+    11 : 487,
+    12 : 520,
+    13 : 500,
+    14 : 531,
+    15 : 500,
+    16 : 489,
+    17 : 515,
+    18 : 511,
+    19 : 500,
+    20 : 493,
+    21 : 511,
+    22 : 482,
+    23 : 488,
+    24 : 464,
 }
 
 class LX16A:
