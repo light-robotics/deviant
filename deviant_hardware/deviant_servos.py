@@ -81,9 +81,9 @@ class DeviantServos:
     def get_board_by_id(self, id: int) -> LX16A:
         if id in [3, 4, 5, 21, 22, 23]:
             return self.m1
-        if id in [9, 10, 11, 15, 16, 17]:
-            return self.m2
         if id in [1, 2, 6, 7, 8, 12]:
+            return self.m2
+        if id in [9, 10, 11, 15, 16, 17]:
             return self.m3
         if id in [13, 14, 18, 19, 20, 24]:
             return self.m4

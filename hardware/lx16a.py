@@ -40,26 +40,26 @@ neutral = {
 neutral = {
     1 : 500,
     2 : 481,
-    3 : 522,
-    4 : 545,
+    3 : 508,
+    4 : 747,
     5 : 490,
     6 : 492,
     7 : 500,
     8 : 496,
-    9 : 486,
-    10 : 508,
+    9 : 475,
+    10 : 723,
     11 : 487,
     12 : 520,
     13 : 500,
     14 : 531,
-    15 : 500,
-    16 : 489,
+    15 : 535,
+    16 : 750,
     17 : 515,
     18 : 511,
     19 : 500,
     20 : 493,
     21 : 511,
-    22 : 482,
+    22 : 755,
     23 : 488,
     24 : 464,
 }
@@ -133,7 +133,7 @@ class LX16A:
 
     # send packet and return response
     def send_receive_packet(self, packet: bytes, receive_size: int) -> bytes:
-        num_attempts = 5
+        num_attempts = 10
         for _ in range(num_attempts):
             # t_id = packet[0]     
             # t_command = packet[2]
@@ -400,7 +400,7 @@ class LX16A:
     # Read servo position
     # the value can be negative then it is signed short
     def read_position(self, id: int) -> int:
-        num_attempts = 5
+        num_attempts = 10
         for attempt in range(num_attempts):
             try:
                 packet = struct.pack(
@@ -422,7 +422,7 @@ class LX16A:
         num_attempts = 5
         for i in range(num_attempts):
             angle = round((self.read_position(id) - neutral[id]) * 0.24 , 2)
-            if -150 <= angle <= 150:
+            if -170 <= angle <= 170:
                 return angle
             self.logger.info(f'Attempt to read angle from servo {id} failed. Value : {angle}')
             # if i > 1:

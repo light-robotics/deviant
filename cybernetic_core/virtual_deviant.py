@@ -26,21 +26,21 @@ class VirtualDeviant(DeviantKinematics):
     def get_sequence(self, command: str):        
         if command == 'forward_1':
             # Legs 1 and 3 moved x1
-            self.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, 0)
+            self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_2':
             # Legs 2 and 4 moved x2
-            self.move_2_legs_phased_24(2 * FORWARD_LEGS_2LEG_CM, 0)
+            self.move_2_legs_phased_24(0, 2 * FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_22':
             # Legs 2 and 4 moved x1
-            self.move_2_legs_phased_24(FORWARD_LEGS_2LEG_CM, 0)
+            self.move_2_legs_phased_24(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_3':
             # Legs 1 and 3 moved x2
-            self.move_2_legs_phased_13(2 * FORWARD_LEGS_2LEG_CM, 0)
+            self.move_2_legs_phased_13(0, 2 * FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_32':
             # Legs 1 and 3 moved x1
-            self.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, 0)
+            self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_one_legged':
-            self.move_body_straight(FORWARD_LEGS_1LEG_CM, 0)
+            self.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
         elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
             self.switch_mode(command)
         elif command == 'body_forward':
