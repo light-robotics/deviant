@@ -21,6 +21,7 @@ class WheelsDirection(Enum):
     SIDEWAYS       = 4
     DIAGONAL_RIGHT = 5
     DIAGONAL_LEFT  = 6
+    NEUTRAL        = 7
 
 servos_to_angles_mapping = {
     2  : "leg1_delta",
@@ -107,11 +108,16 @@ class DeviantServos:
             adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 45
             adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 45
             adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 45
-        elif self.wheels_direction in (WheelsDirection.TURN, WheelsDirection.WALK):
+        elif self.wheels_direction in [WheelsDirection.TURN, WheelsDirection.WALK]:
             adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 75
             adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 75
             adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 75
             adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] + 75
+        elif self.wheels_direction == WheelsDirection.NEUTRAL:
+            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"]
+            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"]
+            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"]
+            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"]
         return adapted_angles
 
     def send_command_to_servos(self, angles, rate=1000):
@@ -139,6 +145,9 @@ class DeviantServos:
             self.wheels_direction = WheelsDirection.TURN
         elif command in ('walking'):
             self.wheels_direction = WheelsDirection.WALK
+            speed = 0
+        elif command in ('neutral'):
+            self.wheels_direction = WheelsDirection.NEUTRAL
             speed = 0
         else:
             print(f'Unknown command {command}')

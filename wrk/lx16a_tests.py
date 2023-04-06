@@ -23,13 +23,13 @@ if __name__ == '__main__':
     # m1.move_servo_to_angle(4, 0, 1000)
     # m1.move_servo_to_angle(3, 0, 1000)
 
-    m1.move_servo_to_angle(22, -150, 3000)
-    time.sleep(3.0)
+    # m1.move_servo_to_angle(22, -150, 3000)
+    # time.sleep(3.0)
     #m1.move_servo_to_angle(22, 2, 3000)
     #time.sleep(3.0)
-    #m3.move_servo_to_angle(16, 2, 3000)
-    #time.sleep(3.0)
-    print(m1.read_angle(22))
+    # m3.move_servo_to_angle(11, -85, 3000)
+    # time.sleep(3.0)
+    # print(m3.read_angle(11))
 
     for i in [3, 4, 5, 21, 22, 23]:
         m1.read_values(i)

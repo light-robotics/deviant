@@ -1,6 +1,6 @@
 leg = {
     "a": 11,    # PointA to PointB - femur
-    "b": 7,    # PointB to PointC - femur-tibia
+    "b": 8,    # PointB to PointC - femur-tibia
     "c": 20,   # PointC to PointD - tibia / point toe length
     "d": 7.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 5.16,
@@ -12,14 +12,14 @@ angles = {
         "min" : -80,
         "max" : 80,
         "step": 5,
-        "ideal": 0,
+        "ideal": -20,
     },
     "alpha": {
         "min": -60,
-        "max": 70,
+        "max": 83,
     },
     "beta": {
-        "min": -105,
+        "min": -150,
         "max": 0,
     },
     "gamma": {
@@ -38,9 +38,9 @@ angles = {
 
 start = {
     "vertical"                 : 15,
-    "horizontal_x"             : 18,
-    "horizontal_y"             : 18,
-    "x_offset_body"            : 0,
+    "horizontal_x"             : 16,
+    "horizontal_y"             : 16,
+    "x_offset_body"            : 2,
     "initial_z_position_delta" : 10, # 3
 }
 

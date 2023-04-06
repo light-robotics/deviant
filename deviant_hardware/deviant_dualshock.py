@@ -170,7 +170,7 @@ class DeviantDualShock(DualShock):
             self.command_writer.write_wheels_command('turn', 0)
     
     def on_R3_up(self, value):
-        if self.mode in [DeviantModes.RUN]:
+        if self.mode in [DeviantModes.RUN, DeviantModes.TURN]:
             self.command_writer.write_command('forward_two_legged', 250)
         elif self.mode in [DeviantModes.CLIMBING]:
             self.command_writer.write_command('forward_one_legged', 500)
@@ -242,7 +242,7 @@ class DeviantDualShock(DualShock):
     def on_square_press(self):
         self.mode = DeviantModes.CLIMBING
         self.neopixel.issue_command('steady', color='blue')    
-        self.command_writer.write_wheels_command('forward', 0)
+        self.command_writer.write_wheels_command('neutral', 0)
         self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to CLIMBING')
 
