@@ -217,6 +217,7 @@ class DeviantServos:
             current_angles = self.get_current_angles()
             self.logger.info(f'current angles: {current_angles}')
             # if diff from prev angles or target angles is small - continue
+            self.logger.info('Target, then prev')
             diff_from_target = self.get_angles_diff(angles, current_angles)
             diff_from_prev = self.get_angles_diff(current_angles, prev_angles)
 
@@ -254,6 +255,8 @@ class DeviantServos:
                 break
 
             prev_angles = dict(current_angles)
+        diff_from_target = self.get_angles_diff(angles, current_angles)
+        self.logger.info(f'Final Diff from target: max: {diff_from_target[1]}, {diff_from_target[0]}')
 
     def set_servo_values_paced_single_adjustment(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)

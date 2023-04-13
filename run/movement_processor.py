@@ -171,6 +171,7 @@ class MovementProcessor:
                 move_function(angles)
             else:
                 time.sleep(1.0)
+            # time.sleep(5.0)
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
 
     def move(self):

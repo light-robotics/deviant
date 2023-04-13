@@ -256,7 +256,8 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoint')
 
     def leg_move_with_compensation(self, leg_num, delta_x, delta_y):
-        self.compensated_leg_movement(leg_num, [delta_x, delta_y, cfg.leg_up[1]])
+        self.compensated_leg_movement(leg_num, [0, 0, cfg.leg_up[1]])
+        self.compensated_leg_movement(leg_num, [delta_x, delta_y, 0])
         self.logger.info(f'Processing leg {leg_num} move_end_point {[0, 0, -cfg.leg_up[1]]}')
         self.move_leg_endpoint(leg_num, [0, 0, -cfg.leg_up[1]])
 
