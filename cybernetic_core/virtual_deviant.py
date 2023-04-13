@@ -40,10 +40,10 @@ class VirtualDeviant(DeviantKinematics):
             # Legs 1 and 3 moved x1
             self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_one_legged':
-            #self.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
-            self.leg_move_with_compensation(2, 0, -FORWARD_LEGS_1LEG_CM)
-            self.leg_move_with_compensation(2, 0, FORWARD_LEGS_1LEG_CM)
-            self.body_to_center()
+            self.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
+            #self.leg_move_with_compensation(2, 0, -FORWARD_LEGS_1LEG_CM)
+            #self.leg_move_with_compensation(2, 0, FORWARD_LEGS_1LEG_CM)
+            #self.body_to_center()
         elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
             self.switch_mode(command)
         elif command == 'body_forward':
