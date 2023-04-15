@@ -1,6 +1,7 @@
 import time
 import sys
 import os
+import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, List
@@ -54,6 +55,16 @@ def convert_kinematic_angles_to_ids(angles: Dict[str, Dict[str, float]]) -> Dict
 
     return angles_to_ids_values
 
+def target_overshoot(current: float, target: float) -> float:
+    overshoot_value = 0
+    if abs(target - current) > 2:
+        overshoot_value = 3
+    elif abs(target - current) > 1:
+        overshoot_value = 2
+    
+    overshoot_value = math.copysign(overshoot_value, target - current)
+
+    return target + overshoot_value
 
 class DeviantServos:
     def __init__(self):
@@ -291,6 +302,25 @@ class DeviantServos:
         
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+        time.sleep(rate / 1000)
+    
+    def paced_wof_overshoot(self, angles):
+        current_angles = self.get_current_angles()
+        # calculate new target
+        new_target = {}
+        for angle, value in angles.items():
+            new_target[angle] = target_overshoot(current_angles[angle], value)
+        
+        for k, v in angles.items():
+            self.logger.info(f'Angle {k}. Current: {current_angles[k]}. Target: {v}. Overshoot: {new_target[k]}')
+
+        diff_from_target = self.get_angles_diff(new_target, current_angles)
+        self.logger.info(f'Diff from target: {diff_from_target[0]}')
+        rate = round(max(self.speed * diff_from_target[1] / 45, self.max_speed)) # speed is normalized
+        self.logger.info(f'max_angle_diff: {diff_from_target[1]}, self.speed : {self.speed}, rate : {rate}')
+
+        self.send_command_to_servos(new_target, rate)
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {new_target}')
         time.sleep(rate / 1000)
 
 

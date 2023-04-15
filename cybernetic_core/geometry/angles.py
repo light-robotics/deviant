@@ -230,11 +230,17 @@ def get_best_angles(all_angles):
     return best_angles
 
 def get_angles_distance(angles):
-    # no diff, just distance with perpendicular
     # 100 -> endleg leaning inside
     #return (math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"]) ** 2
-    return (math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"]) ** 2
-
+    #print('------------------------------')
+    #print(f'Alpha: {math.degrees(angles[0])}. Beta: {math.degrees(angles[1])}. Gamma: {math.degrees(angles[2])}')
+    #old_value = (math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"]) ** 2
+    new_value = 2 * abs(math.degrees(angles[0]) - cfg.angles["alpha"]["ideal"]) + \
+           2 * abs(math.degrees(angles[1]) - cfg.angles["beta"]["ideal"]) + \
+           2 * abs(math.degrees(angles[2]) - cfg.angles["gamma"]["ideal"]) + \
+           4 * abs(math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"])
+    #print(f'Old algorithm: {old_value}. New: {new_value}')
+    return new_value
 
 # ----------------------
 # moves for Fenix

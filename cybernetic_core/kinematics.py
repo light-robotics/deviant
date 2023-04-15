@@ -102,7 +102,7 @@ class DeviantKinematics:
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D1 = Point(self.legs_offset_h_x - cfg.start["x_offset_body"],
-                   self.legs_offset_h_y,
+                   self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 1')
         Leg1 = Leg(O1, D1)
@@ -111,7 +111,7 @@ class DeviantKinematics:
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D2 = Point(self.legs_offset_h_x - cfg.start["x_offset_body"],
-                   -self.legs_offset_h_y,
+                   -self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 2')
         Leg2 = Leg(O2, D2)
@@ -120,7 +120,7 @@ class DeviantKinematics:
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D3 = Point(-self.legs_offset_h_x - cfg.start["x_offset_body"],
-                   -self.legs_offset_h_y,
+                   -self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 3')
         Leg3 = Leg(O3, D3)
@@ -129,7 +129,7 @@ class DeviantKinematics:
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D4 = Point(-self.legs_offset_h_x - cfg.start["x_offset_body"],
-                   self.legs_offset_h_y,
+                   self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 4')
         Leg4 = Leg(O4, D4)
@@ -181,7 +181,7 @@ class DeviantKinematics:
                                   cfg.start["initial_z_position_delta"])
             
 
-    def body_delta_xy(self, delta_y=0, delta_x=cfg.start["x_offset_body"]):
+    def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=cfg.start["x_offset_body"]):
         # move body to center
         avg_o_x, avg_o_y, avg_d_x, avg_d_y = 0, 0, 0, 0
         for leg in self.legs.values():
@@ -199,7 +199,7 @@ class DeviantKinematics:
                 round(avg_o_y - avg_d_y - delta_y, 2)]
                            
 
-    def body_to_center(self, delta_y=0, delta_x=cfg.start["x_offset_body"]):
+    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=cfg.start["x_offset_body"]):
         # move body to center
         
         body_delta_xy = self.body_delta_xy(delta_y, delta_x)
