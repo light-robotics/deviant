@@ -54,7 +54,8 @@ class DeviantDualShock(DualShock):
         self.command_writer.write_command('none', 1000)
     
     def on_share_press(self):
-        self.command_writer.write_command('reset', 1000)
+        #self.command_writer.write_command('reset', 1000)
+        self.command_writer.write_command('legs_up_down', 300)
 
     def on_R1_press(self):
         if self.light_on:

@@ -158,7 +158,8 @@ class DeviantServos:
             self.wheels_direction = WheelsDirection.WALK
             speed = 0
         elif command in ('neutral'):
-            self.wheels_direction = WheelsDirection.NEUTRAL
+            #self.wheels_direction = WheelsDirection.NEUTRAL
+            self.wheels_direction = WheelsDirection.WALK
             speed = 0
         else:
             print(f'Unknown command {command}')
@@ -221,6 +222,7 @@ class DeviantServos:
         time.sleep(0.8 * rate / 1000)
         #time.sleep(0.05)
         adjustment_done = False
+        adjusted_angles = None
         
         for s in range(50):
             self.logger.info(f'Step {s}')
@@ -266,8 +268,12 @@ class DeviantServos:
                 break
 
             prev_angles = dict(current_angles)
-        diff_from_target = self.get_angles_diff(angles, current_angles)
-        self.logger.info(f'Final Diff from target: max: {diff_from_target[1]}, {diff_from_target[0]}')
+
+        self.logger.info('Function set_servo_values_paced_full_adjustment')
+
+        self.log_movement_result(angles, adjusted_angles)
+        #diff_from_target = self.get_angles_diff(angles, current_angles)
+        #self.logger.info(f'Final Diff from target: max: {diff_from_target[1]}, {diff_from_target[0]}')
 
     def set_servo_values_paced_single_adjustment(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
@@ -303,6 +309,9 @@ class DeviantServos:
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
         time.sleep(rate / 1000)
+
+        self.logger.info('Function set_servo_values_paced_wo_feedback')
+        self.log_movement_result(angles)
     
     def paced_wof_overshoot(self, angles):
         current_angles = self.get_current_angles()
@@ -311,9 +320,6 @@ class DeviantServos:
         for angle, value in angles.items():
             new_target[angle] = target_overshoot(current_angles[angle], value)
         
-        for k, v in angles.items():
-            self.logger.info(f'Angle {k}. Current: {current_angles[k]}. Target: {v}. Overshoot: {new_target[k]}')
-
         diff_from_target = self.get_angles_diff(new_target, current_angles)
         self.logger.info(f'Diff from target: {diff_from_target[0]}')
         rate = round(max(self.speed * diff_from_target[1] / 45, self.max_speed)) # speed is normalized
@@ -322,6 +328,16 @@ class DeviantServos:
         self.send_command_to_servos(new_target, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {new_target}')
         time.sleep(rate / 1000)
+
+        self.log_movement_result(angles, new_target)
+    
+    def log_movement_result(self, target, adjusted=None):
+        current_angles = self.get_current_angles()
+        for k, v in target.items():
+            if adjusted:
+                self.logger.info(f'Angle {k}. Current: {current_angles[k]}. Target: {v}. Adjusted: {adjusted[k]}')
+            else:
+                self.logger.info(f'Angle {k}. Current: {current_angles[k]}. Target: {v}.')
 
 
 if __name__ == '__main__':

@@ -40,7 +40,7 @@ class VirtualDeviant(DeviantKinematics):
             # Legs 1 and 3 moved x1
             self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_one_legged':
-            self.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
+            self.move_body_straight(0, FORWARD_LEGS_1LEG_CM, [1, 4, 2, 3])
             #self.leg_move_with_compensation(2, 0, -FORWARD_LEGS_1LEG_CM)
             #self.leg_move_with_compensation(2, 0, FORWARD_LEGS_1LEG_CM)
             #self.body_to_center()
@@ -89,6 +89,8 @@ class VirtualDeviant(DeviantKinematics):
             self.reposition_legs(-10, 10)
         elif command == 'reposition_narrower':
             self.reposition_legs(10, -10)
+        elif command == 'legs_up_down':
+            self.reposition_legs(0, 0)
         elif command == 'start':
             self.start()
         elif command == 'end':

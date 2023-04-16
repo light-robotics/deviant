@@ -314,8 +314,6 @@ class DeviantKinematics:
 
     def reposition_legs(self, delta_x, delta_y):
         self.logger.info(f'reposition_legs ({delta_x}, {delta_y})')
-        if delta_x == delta_y == 0:
-            return None
 
         self.legs[2].move_end_point(delta_x, -delta_y, cfg.leg_up[1])
         self.legs[4].move_end_point(-delta_x, delta_y, cfg.leg_up[1])

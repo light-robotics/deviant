@@ -41,16 +41,16 @@ angles = {
 
 start = {
     "vertical"                 : 18,
-    "horizontal_x"             : 16,
-    "horizontal_y"             : 16,
+    "horizontal_x"             : 17,
+    "horizontal_y"             : 17,
     "x_offset_body"            : 0,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 10, # 3
 }
 
-margin = 6
+margin = 10
 
 leg_up = {
-    1: 5,
-    2: 7
+    1: 7,
+    2: 10
 }
