@@ -44,11 +44,11 @@ start = {
     "horizontal_x"             : 17,
     "horizontal_y"             : 17,
     "x_offset_body"            : 0,
-    "y_offset_body"            : 0,
+    "y_offset_body"            : -1,
     "initial_z_position_delta" : 10, # 3
 }
 
-margin = 10
+margin = 8
 
 leg_up = {
     1: 5,

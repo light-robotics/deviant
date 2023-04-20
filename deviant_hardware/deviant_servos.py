@@ -119,7 +119,7 @@ class DeviantServos:
             adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 45
             adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 45
             adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 45
-        elif self.wheels_direction == WheelsDirection.TURN:
+        elif self.wheels_direction in [WheelsDirection.TURN, WheelsDirection.WALK]:
             adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 75
             adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 75
             adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 75
@@ -129,11 +129,11 @@ class DeviantServos:
             adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"]
             adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"]
             adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"]
-        elif self.wheels_direction == WheelsDirection.WALK:
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 120
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 120
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 120
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 120
+        #elif self.wheels_direction == WheelsDirection.WALK:
+        #    adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 120
+        #    adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 120
+        #    adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 120
+        #    adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 120
         return adapted_angles
 
     def send_command_to_servos(self, angles, rate=1000):
