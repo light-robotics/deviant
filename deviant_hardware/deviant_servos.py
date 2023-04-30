@@ -172,15 +172,15 @@ class DeviantServos:
         if abs(speed) > 0:
             self.motors_locked = False
 
-        if command in ['backwards', 'turn_ccw']:
-            speed = -speed
+            if command in ['backwards', 'turn_ccw']:
+                speed = -speed
 
-        if command in ['turn', 'turn_ccw']:
-            self.send_command_to_motors([speed, speed, speed, speed])
-        elif command == 'forward_2':
-            self.send_command_to_motors([-speed, -speed, speed, speed], 2)
-        else:
-            self.send_command_to_motors([-speed, -speed, speed, speed])
+            if command in ['turn', 'turn_ccw']:
+                self.send_command_to_motors([speed, speed, speed, speed])
+            elif command == 'forward_2':
+                self.send_command_to_motors([-speed, -speed, speed, speed], 2)
+            else:
+                self.send_command_to_motors([-speed, -speed, speed, speed])
 
     def lock_motors(self):
         if self.motors_locked:
