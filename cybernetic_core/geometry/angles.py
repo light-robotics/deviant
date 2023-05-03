@@ -87,10 +87,10 @@ def calculate_leg_angles(O: Point, D: Point, logger):
 
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
-    logger.info(f'Trying l {l} and delta_z {delta_z}')
+    # logger.info(f'Trying l {l} and delta_z {delta_z}')
     alpha, beta, gamma = get_leg_angles(l, delta_z, logger)
     
-    logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
+    # logger.info(f'Success: (surf) {round(math.degrees(alpha+beta+gamma), 1)} | {round(math.degrees(alpha), 1)}, {round(math.degrees(beta), 1)}, {round(math.degrees(gamma), 1)}')
 
     """
     D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma)

@@ -192,9 +192,9 @@ class MovementProcessor:
                         if prev_wheels_command != new_wheels_command:
                             self.logger.info(f'Command. Wheels. {wheels_command, wheels_speed}')
                             self.execute_wheels_command(wheels_command, wheels_speed)
-                            if wheels_speed == 0:
-                                self.logger.info('Command. Wheels. Lock motors')
-                                self.ds.lock_motors()
+                            #if wheels_speed == 0:
+                            #    self.logger.info('Command. Wheels. Lock motors')
+                            #    self.ds.lock_motors()
                             prev_wheels_command = new_wheels_command
                             # if servos_command_read is None:
                             #     time.sleep(0.1)

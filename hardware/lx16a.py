@@ -164,6 +164,7 @@ class LX16A:
     # several attempts are made to send servo to a certain angle
     # because sometimes command does not work and target stays unchanged
     def move_servo_to_angle(self, id: int, angle: float, rate: int = 0) -> None:
+        self.logger.info(f'move_servo_to_angle {id} : {angle} / {rate}')
         position = max(neutral[id] + int(angle/0.24), 0)
         num_attempts = 3
         for i in range(num_attempts):

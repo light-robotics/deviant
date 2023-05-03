@@ -162,33 +162,45 @@ class DeviantServos:
         elif command in ('walking'):
             self.wheels_direction = WheelsDirection.WALK
             speed = 0
+            self.lock_motors()
+            return
         elif command in ('neutral'):
             #self.wheels_direction = WheelsDirection.NEUTRAL
             self.wheels_direction = WheelsDirection.WALK
             speed = 0
+            self.lock_motors()
+            return
         else:
             print(f'Unknown command {command}')
             return
+
         if abs(speed) > 0:
             self.motors_locked = False
 
-            if command in ['backwards', 'turn_ccw']:
-                speed = -speed
+        if command in ['backwards', 'turn_ccw']:
+            speed = -speed
 
-            if command in ['turn', 'turn_ccw']:
-                self.send_command_to_motors([speed, speed, speed, speed])
-            elif command == 'forward_2':
-                self.send_command_to_motors([-speed, -speed, speed, speed], 2)
-            else:
-                self.send_command_to_motors([-speed, -speed, speed, speed])
+        if command in ['turn', 'turn_ccw']:
+            self.send_command_to_motors([speed, speed, speed, speed])
+        elif command == 'forward_2':
+            self.send_command_to_motors([-speed, -speed, speed, speed], 2)
+        else:
+            self.send_command_to_motors([-speed, -speed, speed, speed])
 
     def lock_motors(self):
         if self.motors_locked:
+            self.logger.info('Motors already locked')
             return
+
+        self.send_command_to_motors([0, 0, 0, 0])
 
         self.logger.info(f'Motors hardlocked')
         for id in self.motor_ids:
-            self.get_board_by_id(id).move_servo_to_angle(id, 0, 0)
+            self.get_board_by_id(id).motor_or_servo(id, 0, 0)
+            time.sleep(0.005)
+            current_angle = self.get_board_by_id(id).read_angle(id)
+            self.logger.info(f'{id} lock angle: {current_angle}')
+            self.get_board_by_id(id).move_servo_to_angle(id, current_angle, 200)
         self.motors_locked = True
 
     def print_status(self):
