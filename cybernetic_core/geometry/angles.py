@@ -159,6 +159,13 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
     elif leg_number == 4:
         tetta_degrees -= 135
     
+    if tetta_degrees > 80:
+        print(f'Tetta converted {tetta_degrees} -> {tetta_degrees - 360}')
+        tetta_degrees -= 360
+    if tetta_degrees < -80:
+        print(f'Tetta converted {tetta_degrees} -> {tetta_degrees + 360}')
+        tetta_degrees += 360
+
     return round(tetta_degrees, 2)
 
 def convert_tetta_back(tetta_degrees: float, leg_number: int) -> float:
