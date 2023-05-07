@@ -170,6 +170,11 @@ class DeviantServos:
             speed = 0
             self.lock_motors()
             return
+        elif command in ('climbing'):
+            self.wheels_direction = WheelsDirection.FORWARD
+            speed = 0
+            self.lock_motors()
+            return
         else:
             print(f'Unknown command {command}')
             return

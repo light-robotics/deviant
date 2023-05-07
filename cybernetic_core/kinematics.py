@@ -332,26 +332,46 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoints')
 
     def climb_obstacle(self):
-        step_len = 13
-        narrowing_len = 1
-        obstacle_z = 10
-        self.reposition_legs(-2, 2)
-        self.body_movement(0, 0, 8)
-        self.leg_move_with_compensation_obstacled(1, step_len, -narrowing_len, obstacle_z)
-        self.compensated_leg_movement(2, [0, -5, self.obstacled_leg_up + obstacle_z])
-        self.legs[2].move_end_point(step_len, narrowing_len + 5, 0)
+        step_len = 8
+        obstacle_z = 13
+        self.body_movement(0, 0, obstacle_z)
+
+        self.compensated_leg_movement(1, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[1].move_end_point(0, step_len, 0)
         self.add_angles_snapshot('endpoint')
-        self.legs[2].move_end_point(0, 0, -self.obstacled_leg_up)
+        self.legs[1].move_end_point(0, 0, -cfg.leg_up[1])
         self.add_angles_snapshot('endpoint')
-        #self.leg_move_with_compensation_obstacled(2, step_len, narrowing_len, obstacle_z)
-        self.body_movement(0, 0, -3)
-        self.leg_move_with_compensation(3, -step_len/2, 5)
-        self.leg_move_with_compensation(4, -step_len/2, -5)
-        #self.body_to_center()
-        narrowing_len = 6
-        self.leg_move_with_compensation_obstacled(3, step_len, -2*narrowing_len, obstacle_z)
-        self.leg_move_with_compensation_obstacled(4, step_len, 2*narrowing_len, obstacle_z)
-        #self.body_to_center()
+
+        self.compensated_leg_movement(4, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[4].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[4].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+
+        self.body_movement(0, step_len, 0)
+        self.body_to_center()
+
+    #def climb_obstacle_2(self):
+        step_len = 8
+        obstacle_z = 13
+
+        # self.body_movement(0, 0, -2)
+
+        self.compensated_leg_movement(2, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[2].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[2].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+        print(5)
+
+        self.compensated_leg_movement(3, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[3].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[3].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+        print(6)
+
+        self.body_to_center()
 
 if __name__ == '__main__':
     fk = DeviantKinematics()

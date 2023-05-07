@@ -199,8 +199,9 @@ class DeviantDualShock(DualShock):
             self.command_writer.write_command('reposition_wider', 500)
 
     def on_left_arrow_press(self):
-        if self.mode in [DeviantModes.OBSTACLES]:
-            self.command_writer.write_command('reposition_narrower', 500)
+        #if self.mode in [DeviantModes.OBSTACLES]:
+        #    self.command_writer.write_command('reposition_narrower', 500)
+        self.command_writer.write_command('climb', 1000)
       
     def on_up_arrow_press(self):
         #if self.mode in [DeviantModes.RUN, DeviantModes.OBSTACLES]:
@@ -222,7 +223,7 @@ class DeviantDualShock(DualShock):
     def on_x_press(self):
         self.mode = DeviantModes.OBSTACLES
         self.neopixel.issue_command('steady', color='purple')
-        self.command_writer.write_wheels_command('forward', 0)
+        self.command_writer.write_wheels_command('climbing', 0)
         self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to OBSTACLES')
 

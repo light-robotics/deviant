@@ -83,7 +83,7 @@ class VirtualDeviant(DeviantKinematics):
             self.body_movement(0, 0, -4)
         elif command == 'down_6':
             self.body_movement(0, 0, -6)
-        elif command == 'climb_12_1':
+        elif command == 'climb':
             self.climb_obstacle()
         elif command == 'reposition_wider':
             self.reposition_legs(-10, 10)

@@ -40,7 +40,7 @@ angles = {
 }
 
 start = {
-    "vertical"                 : 19,
+    "vertical"                 : 16,
     "horizontal_x"             : 15,
     "horizontal_y"             : 15,
     "x_offset_body"            : 0,
@@ -48,9 +48,9 @@ start = {
     "initial_z_position_delta" : 10, # 3
 }
 
-margin = 5
+margin = 4
 
 leg_up = {
-    1: 7,
+    1: 4,
     2: 5
 }
