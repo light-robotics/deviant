@@ -161,26 +161,35 @@ class DeviantServos:
             self.wheels_direction = WheelsDirection.TURN
         elif command in ('walking'):
             self.wheels_direction = WheelsDirection.WALK
-            speed = 0
-            self.lock_motors()
+            #speed = 0
+            #self.lock_motors()
             return
         elif command in ('neutral'):
             #self.wheels_direction = WheelsDirection.NEUTRAL
             self.wheels_direction = WheelsDirection.WALK
-            speed = 0
-            self.lock_motors()
+            #speed = 0
+            #self.lock_motors()
             return
         elif command in ('climbing'):
             self.wheels_direction = WheelsDirection.FORWARD
-            speed = 0
-            self.lock_motors()
+            #speed = 0
+            #self.lock_motors()
             return
+        elif command in ['lock_wheels', 'unlock_wheels']:
+            self.logger.info('Will be processed separately')
         else:
             print(f'Unknown command {command}')
             return
 
-        if abs(speed) > 0:
-            self.motors_locked = False
+        if command == 'lock_wheels':
+            self.lock_motors()
+            return
+        elif command == 'unlock_wheels':
+            self.unlock_motors()
+            return
+        elif self.motors_locked:
+            self.logger.info(f'Got command {command}. Ignoring: motors locked.')
+            return
 
         if command in ['backwards', 'turn_ccw']:
             speed = -speed
@@ -193,11 +202,7 @@ class DeviantServos:
             self.send_command_to_motors([-speed, -speed, speed, speed])
 
     def lock_motors(self):
-        if self.motors_locked:
-            self.logger.info('Motors already locked')
-            return
-
-        self.send_command_to_motors([0, 0, 0, 0])
+        # self.send_command_to_motors([0, 0, 0, 0])
 
         self.logger.info(f'Motors hardlocked')
         for id in self.motor_ids:
@@ -207,6 +212,14 @@ class DeviantServos:
             self.logger.info(f'{id} lock angle: {current_angle}')
             self.get_board_by_id(id).move_servo_to_angle(id, current_angle, 200)
         self.motors_locked = True
+        self.logger.info(f'lock_motors self.motors_locked set to {self.motors_locked}')
+    
+    def unlock_motors(self):
+        self.logger.info(f'Motors unlocked')
+        for id in self.motor_ids:
+            self.get_board_by_id(id).motor_or_servo(id, 1, 0)
+        self.motors_locked = False
+        self.logger.info(f'unlock_motors self.motors_locked set to {self.motors_locked}')
 
     def print_status(self):
         j = 1

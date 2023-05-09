@@ -24,7 +24,7 @@ class DeviantDualShock(DualShock):
         self.neopixel = NeopixelCommandsSetter()
         self.connect()
         self.light_on = False
-        self.started = False
+        self.wheels_locked = False
         self.mode = DeviantModes.RUN
         self.command_writer = CommandsWriter()
         self.command_writer.write_command('none', 1000)
@@ -33,7 +33,7 @@ class DeviantDualShock(DualShock):
     def connect(self):
         self.neopixel.issue_command('rainbow_blue')
         super().__init__()
-        self.neopixel.issue_command('blink_blue')        
+        self.neopixel.issue_command('blink_blue')
         time.sleep(3)
         self.neopixel.issue_command('shutdown')
 
@@ -41,12 +41,12 @@ class DeviantDualShock(DualShock):
         super().listen()
 
     def on_playstation_button_press(self):
-        if self.started:
-            self.started = False
-            self.command_writer.write_command('end', 1000)
+        if self.wheels_locked:
+            self.wheels_locked = False
+            self.command_writer.write_wheels_command('unlock_wheels', 0)
         else:
-            self.started = True
-            self.command_writer.write_command('start', 1000)
+            self.wheels_locked = True
+            self.command_writer.write_wheels_command('lock_wheels', 0)
     
     def on_options_press(self):
         self.command_writer.write_command('exit', 0)
