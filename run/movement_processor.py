@@ -22,6 +22,7 @@ class MovementProcessor:
         self.logger.info('==================START==================')
 
         self.max_processed_command_id = 0
+        self.max_processed_side_command_id = 0
         self.state = '0'
 
         self.vd = VirtualDeviant()
@@ -74,8 +75,54 @@ class MovementProcessor:
         self.max_processed_command_id = command_id
         return command, int(contents[2])
 
+    def read_servos_side_command(self) -> Optional[Union[str, int]]:        
+        with open(code_config.side_movement_command_file, 'r') as f:
+            contents = f.readline().split(',')
+
+        if len(contents) != 3:
+            return None
+
+        command_id = int(contents[0])
+        command = contents[1].strip()
+
+        # this commands are not excluded even if id is the same
+        repeating_commands = [
+            'forward_two_legged',
+            'backward_two_legged',
+            'strafe_left_two_legged',
+            'strafe_right_two_legged', 
+            #'up', 
+            #'down',
+            'body_forward',
+            'body_backward',
+            'body_left',
+            'body_right',            
+            'turn_right',
+            'turn_left'
+            ]        
+
+        if self.max_processed_side_command_id == 0:
+            self.max_processed_side_command_id = command_id
+        elif self.max_processed_side_command_id == command_id and \
+            command not in repeating_commands:
+            # command has already been processed
+            #print(f'Command {contents} has already been processed')
+            return None
+
+        self.max_processed_side_command_id = command_id
+        return command, int(contents[2])
+
     def read_wheels_command(self):
         with open(code_config.wheels_command_file, 'r') as f:
+            contents = f.readline().split(',')
+        
+        if len(contents) != 2:
+            return None
+        
+        return contents[0].strip(), int(contents[1])
+    
+    def read_wheels_side_command(self):
+        with open(code_config.side_wheels_command_file, 'r') as f:
             contents = f.readline().split(',')
         
         if len(contents) != 2:
@@ -176,12 +223,18 @@ class MovementProcessor:
 
     def move(self):
         prev_wheels_command = ''
+        prev_wheels_side_command = ''
         try:
             while True:
                 servos_command_read = self.read_servos_command()
+                servos_side_command_read = self.read_servos_side_command()
                 wheels_command_read = self.read_wheels_command()
+                wheels_side_command_read = self.read_wheels_side_command()
                 
-                if servos_command_read is None and wheels_command_read is None:
+                if servos_command_read is None and \
+                    wheels_command_read is None and \
+                      servos_side_command_read is None and \
+                        wheels_side_command_read is None:
                     time.sleep(0.1)
                     continue
 
@@ -192,12 +245,23 @@ class MovementProcessor:
                         if prev_wheels_command != new_wheels_command:
                             self.logger.info(f'Command. Wheels. {wheels_command, wheels_speed}')
                             self.execute_wheels_command(wheels_command, wheels_speed)
-                            #if wheels_speed == 0:
-                            #    self.logger.info('Command. Wheels. Lock motors')
-                            #    self.ds.lock_motors()
                             prev_wheels_command = new_wheels_command
-                            # if servos_command_read is None:
-                            #     time.sleep(0.1)
+
+                if wheels_side_command_read is not None:
+                    # TODO
+                    wheels_side_command, wheels_side_speed = wheels_side_command_read
+                    if not code_config.DEBUG:
+                        new_wheels_side_command = f'{wheels_side_command}-{wheels_side_speed}'
+                        if prev_wheels_side_command != new_wheels_side_command:
+                            self.logger.info(f'Side Command. Wheels. {wheels_side_command, wheels_side_speed}')
+                            # self.execute_wheels_command(wheels_side_command, wheels_side_speed)
+                            prev_wheels_side_command = new_wheels_side_command
+
+
+                if servos_side_command_read is not None:
+                    servos_side_command, servos_side_speed = servos_side_command_read
+                    self.logger.info(f'Side Command. Servos. {servos_side_command, servos_side_speed}')
+                    # TODO
 
                 if servos_command_read is not None:
                     servos_command, servos_speed = servos_command_read

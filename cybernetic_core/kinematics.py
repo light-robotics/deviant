@@ -373,6 +373,27 @@ class DeviantKinematics:
 
         self.body_to_center()
 
+    def spear_up(self):
+        self.leg_move_with_compensation(4, 12, 0)
+        self.body_movement(0, -6, 0)
+        self.legs[1].move_end_point(0, 5, 7)
+        self.add_angles_snapshot('endpoint')
+        self.legs[1].move_end_point(0, 15, 7)
+        self.add_angles_snapshot('endpoint')
+        #self.body_to_center()
+
+    def spear_down(self):
+        #self.compensated_leg_movement(1, [0, -15, -3])
+        #self.compensated_leg_movement(1, [0, -5, -7])
+        self.legs[1].move_end_point(0, -15, -7)
+        self.add_angles_snapshot('endpoint')
+        self.legs[1].move_end_point(0, -5, -7)
+        self.add_angles_snapshot('endpoint')
+        self.body_movement(0, 6, 0)
+        self.leg_move_with_compensation(4, -12, 0)
+        self.body_to_center()
+        
+
 if __name__ == '__main__':
     fk = DeviantKinematics()
     angles = fk.current_position #sequence[-1].angles_snapshot

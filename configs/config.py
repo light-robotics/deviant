@@ -17,11 +17,12 @@ modes = {
         "horizontal_xy" : 17,
     }
 }
-
+"""
 speed = {
     "run" : 350,
     "hit" : 500,
 }
+"""
 
 moves = {
     "up_or_down_cm"         : 2,
