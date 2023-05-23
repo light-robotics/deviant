@@ -318,23 +318,27 @@ class DeviantKinematics:
         self.legs[2].move_end_point(delta_x, -delta_y, cfg.leg_up[1])
         self.legs[4].move_end_point(-delta_x, delta_y, cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
+        self.logger.info(f'Legs 2-4 up')
 
         self.legs[2].move_end_point(0, 0, -cfg.leg_up[1])
         self.legs[4].move_end_point(0, 0, -cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
+        self.logger.info(f'Legs 2-4 down')
 
         self.legs[1].move_end_point(delta_x, delta_y, cfg.leg_up[1])
         self.legs[3].move_end_point(-delta_x, -delta_y, cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
+        self.logger.info(f'Legs 1-3 up')
 
         self.legs[1].move_end_point(0, 0, -cfg.leg_up[1])
         self.legs[3].move_end_point(0, 0, -cfg.leg_up[1])
         self.add_angles_snapshot('endpoints')
+        self.logger.info(f'Legs 1-3 down')
 
     def climb_obstacle(self):
         step_len = 8
-        obstacle_z = 13
-        self.body_movement(0, 0, obstacle_z)
+        obstacle_z = 14
+        self.body_movement(0, 0, 13)
 
         self.compensated_leg_movement(1, [0, 0, cfg.leg_up[1] + obstacle_z])
         self.legs[1].move_end_point(0, step_len, 0)
@@ -348,14 +352,12 @@ class DeviantKinematics:
         self.legs[4].move_end_point(0, 0, -cfg.leg_up[1])
         self.add_angles_snapshot('endpoint')
 
-        self.body_movement(0, step_len, 0)
         self.body_to_center()
+        self.body_movement(0, step_len, 0)        
 
     #def climb_obstacle_2(self):
         step_len = 8
-        obstacle_z = 13
-
-        # self.body_movement(0, 0, -2)
+        obstacle_z = 14
 
         self.compensated_leg_movement(2, [0, 0, cfg.leg_up[1] + obstacle_z])
         self.legs[2].move_end_point(0, step_len, 0)
