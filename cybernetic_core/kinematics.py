@@ -36,16 +36,22 @@ class Leg:
         self.update_angles()
 
 class DeviantKinematics:
-    def __init__(self):
+    def __init__(self, v=None, h_x=None, h_y=None):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('main_logger')
 
-        self.legs_offset_v = cfg.start['vertical']
-        self.legs_offset_h_x = cfg.start['horizontal_x']
-        self.legs_offset_h_y = cfg.start['horizontal_y']
+        if v and h_x and h_y:
+            self.legs_offset_v = v
+            self.legs_offset_h_x = h_x
+            self.legs_offset_h_y = h_y
+        else:
+            self.legs_offset_v = cfg.start['vertical']
+            self.legs_offset_h_x = cfg.start['horizontal_x']
+            self.legs_offset_h_y = cfg.start['horizontal_y']
         self.legs = self.initiate_legs()
-            
-        print(f"""
+
+        if False:    
+            print(f"""
             Kinematics created with 
             v = {self.legs_offset_v}, 
             h_x = {self.legs_offset_h_x},
@@ -335,10 +341,10 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoints')
         self.logger.info(f'Legs 1-3 down')
 
-    def climb_obstacle(self):
-        step_len = 8
-        obstacle_z = 14
-        self.body_movement(0, 0, 13)
+    def climb_obstacle(self, step_len=11, obstacle_z=12):
+        #step_len = 10
+        #obstacle_z = 13
+        self.body_movement(0, 0, obstacle_z)
 
         self.compensated_leg_movement(1, [0, 0, cfg.leg_up[1] + obstacle_z])
         self.legs[1].move_end_point(0, step_len, 0)
@@ -355,9 +361,50 @@ class DeviantKinematics:
         self.body_to_center()
         self.body_movement(0, step_len, 0)        
 
+    def climb_obstacle_2(self, step_len=11, obstacle_z=12):
+        #step_len = 10
+        #obstacle_z = 13
+
+        self.compensated_leg_movement(2, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[2].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[2].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+        #print(5)
+
+        self.compensated_leg_movement(3, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[3].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[3].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+        #print(6)
+
+        self.body_to_center()
+    
+    def climb_obstacle(self, step_len, side_step_len, obstacle_z):
+        #step_len = 12
+        #side_step_len = 6
+        #obstacle_z = 14
+        self.body_movement(0, 0, obstacle_z)
+
+        self.compensated_leg_movement(1, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[1].move_end_point(-side_step_len, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[1].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+
+        self.compensated_leg_movement(4, [0, 0, cfg.leg_up[1] + obstacle_z])
+        self.legs[4].move_end_point(side_step_len, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.legs[4].move_end_point(0, 0, -cfg.leg_up[1])
+        self.add_angles_snapshot('endpoint')
+
+        self.body_to_center()
+        self.body_movement(0, step_len/2, 0)        
+
     #def climb_obstacle_2(self):
-        step_len = 8
-        obstacle_z = 14
+        #step_len = 9
+        #obstacle_z = 15
 
         self.compensated_leg_movement(2, [0, 0, cfg.leg_up[1] + obstacle_z])
         self.legs[2].move_end_point(0, step_len, 0)
@@ -374,7 +421,7 @@ class DeviantKinematics:
         print(6)
 
         self.body_to_center()
-
+    
     def spear_up(self):
         self.leg_move_with_compensation(4, 12, 0)
         self.body_movement(0, -6, 0)
@@ -397,8 +444,15 @@ class DeviantKinematics:
         
 
 if __name__ == '__main__':
-    fk = DeviantKinematics()
-    angles = fk.current_position #sequence[-1].angles_snapshot
-    print(angles)
-    converted_angles = convert_legs_angles(angles)
-    print(converted_angles)
+    for step_len in [10, 11]:
+        for obstacle_z in [13]:
+            for v in [12, 13, 14, 15, 16]:
+                for h_x in [13, 14, 15]:
+                    for h_y in [13, 14, 15]:
+                        try:
+                            fk = DeviantKinematics(v, h_x, h_y)
+                            fk.climb_obstacle(step_len, obstacle_z)
+                            print(f'Success: {step_len}/{obstacle_z} {v}/{h_x}/{h_y}')
+                        except:
+                            pass
+    
