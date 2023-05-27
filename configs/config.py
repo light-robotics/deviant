@@ -24,15 +24,7 @@ speed = {
 }
 """
 
-moves = {
-    "up_or_down_cm"         : 2,
-    "move_body_cm"          : 7,
-    "forward_body_1_leg_cm" : 8,
-    "forward_body_2_leg_cm" : 8,    
-    "reposition_cm"         : 1,
-    "side_look_angle"       : 12,
-    "vertical_look_angle"   : 30,
-}
+
 
 deviant = {    
     # parameters for moving further, when moving with feedback
@@ -44,15 +36,6 @@ deviant = {
     # when moving without feedback
     "movement_command_advance_ms" : 0.05,
     "movement_overshoot_coefficient" : 0.2,
-}
-
-
-limits = {
-    "body_forward"        : 7,
-    "body_backward"       : 7,
-    "body_sideways"       : 7,
-    "side_look_angle"     : 24,
-    "vertical_look_angle" : 30,
 }
 
 mode = 90

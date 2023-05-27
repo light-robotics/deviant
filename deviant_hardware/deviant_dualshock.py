@@ -15,6 +15,7 @@ class DeviantModes(Enum):
     OBSTACLES = 3
     BATTLE    = 4
     TURN      = 5
+    MOVE_BODY = 6
 
 class DeviantDualShock(DualShock):
     """
@@ -199,24 +200,25 @@ class DeviantDualShock(DualShock):
         self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
-        #if self.mode in [DeviantModes.BATTLE]:
-        #    self.command_writer.write_command('reposition_wider', 500)
-        if self.mode in [DeviantModes.OBSTACLES]:
+        if self.mode in [DeviantModes.MOVE_BODY]:
+            self.command_writer.write_command('body_right', 500)
+        elif self.mode in [DeviantModes.OBSTACLES]:
             self.command_writer.write_command('reposition_wider_8', 500)
         elif self.mode in [DeviantModes.CLIMBING]:
             self.command_writer.write_command('climb_2', 1000)
 
     def on_left_arrow_press(self):
-        #if self.mode in [DeviantModes.BATTLE]:
-        #    self.command_writer.write_command('reposition_narrower', 500)
-        #self.command_writer.write_command('climb', 1000)
-        if self.mode in [DeviantModes.OBSTACLES]:
+        if self.mode in [DeviantModes.MOVE_BODY]:
+            self.command_writer.write_command('body_left', 500)
+        elif self.mode in [DeviantModes.OBSTACLES]:
             self.command_writer.write_command('reposition_narrower_8', 500)
         elif self.mode in [DeviantModes.CLIMBING]:
             self.command_writer.write_command('climb_1', 1000)
       
     def on_up_arrow_press(self):
-        #if self.mode in [DeviantModes.RUN, DeviantModes.BATTLE]:
+        if self.mode in [DeviantModes.MOVE_BODY]:
+            self.command_writer.write_command('body_forward', 500)
+        else:
             self.command_writer.write_command('up', 1000)
         #elif self.mode == DeviantModes.TURN:
         #    self.command_writer.write_command('up_6', 1000)
@@ -224,13 +226,18 @@ class DeviantDualShock(DualShock):
         #    self.command_writer.write_command('climb_12_1', 1000)
 
     def on_down_arrow_press(self):
-        #if self.mode in [DeviantModes.RUN, DeviantModes.CLIMBING, DeviantModes.BATTLE]:
+        if self.mode in [DeviantModes.MOVE_BODY]:
+            self.command_writer.write_command('body_backward', 500)
+        else:
             self.command_writer.write_command('down', 1000)
         #elif self.mode == DeviantModes.TURN:
         #    self.command_writer.write_command('down_6', 1000)
 
     def on_up_down_arrow_release(self):
         self.command_writer.write_command('none', 500)
+
+    def on_left_right_arrow_release(self):
+        self.command_writer.write_command('none', 500)  
         
     def on_x_press(self):
         self.mode = DeviantModes.BATTLE
@@ -260,6 +267,13 @@ class DeviantDualShock(DualShock):
         self.command_writer.write_wheels_command('forward', 0)
         self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to CLIMBING')
+    
+    def on_R3_press(self):
+        if self.mode == DeviantModes.MOVE_BODY:
+            self.command_writer.write_command('body_to_center', 500)
+        else:
+            self.mode = DeviantModes.MOVE_BODY
+            print('Switched mode to MOVE_BODY')
 
 if __name__ == '__main__':
     DeviantDualShock().start()
