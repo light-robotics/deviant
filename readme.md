@@ -10,3 +10,4 @@ To run deviant:
 
 Useful:
 - vcgencmd measure_temp
+- cat /var/log/syslog.1

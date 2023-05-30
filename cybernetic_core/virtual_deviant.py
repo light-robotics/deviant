@@ -18,8 +18,10 @@ class VirtualDeviant(DeviantKinematics):
     def __init__(self):
         super().__init__()
 
-    def get_sequence(self, command: str):        
-        if command == 'forward_1':
+    def get_sequence(self, command: str):
+        if command == 'keep_position':
+            self.add_angles_snapshot()
+        elif command == 'forward_1':
             # Legs 1 and 3 moved x1
             self.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_2':

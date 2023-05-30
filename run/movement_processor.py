@@ -61,7 +61,8 @@ class MovementProcessor:
             'body_left',
             'body_right',            
             'turn_right',
-            'turn_left'
+            'turn_left',
+            'none'
             ]        
 
         if self.max_processed_command_id == 0:
@@ -70,7 +71,7 @@ class MovementProcessor:
             command not in repeating_commands:
             # command has already been processed
             #print(f'Command {contents} has already been processed')
-            return None
+            return 'none', 1000
 
         self.max_processed_command_id = command_id
         return command, int(contents[2])
@@ -166,8 +167,14 @@ class MovementProcessor:
             else:
                 print(f'Executing command {command}')
                 self.logger.info(f'Executing command {command}')
-                if command == 'none':
+                if command == 'none':                    
                     time.sleep(0.1)
+                    speed = 200
+                    if self.speed != speed:
+                        if not code_config.DEBUG:
+                            self.ds.set_speed(speed)
+                        self.speed = speed
+                    self.run_sequence('keep_position')
                 else:    
                     self.run_sequence(command)
 
