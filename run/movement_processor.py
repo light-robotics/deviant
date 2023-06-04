@@ -167,14 +167,15 @@ class MovementProcessor:
             else:
                 print(f'Executing command {command}')
                 self.logger.info(f'Executing command {command}')
-                if command == 'none':                    
-                    time.sleep(0.1)
-                    speed = 200
-                    if self.speed != speed:
-                        if not code_config.DEBUG:
-                            self.ds.set_speed(speed)
-                        self.speed = speed
-                    self.run_sequence('keep_position')
+                if command == 'none':
+                    time.sleep(0.3)
+                    if False: # temporarily disabled
+                        speed = 200
+                        if self.speed != speed:
+                            if not code_config.DEBUG:
+                                self.ds.set_speed(speed)
+                            self.speed = speed
+                        self.run_sequence('keep_position')
                 else:    
                     self.run_sequence(command)
 

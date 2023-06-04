@@ -1,7 +1,7 @@
 leg = {
     "a": 7.4,    # PointA to PointB - femur
     "b": 8,    # PointB to PointC - femur-tibia
-    "c": 18,   # PointC to PointD - tibia / point toe length
+    "c": 16.1,   # PointC to PointD - tibia / point toe length
     "d": 7.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 5.16,
     "phi_angle" : 0 # angle correction for the wheel block
@@ -42,12 +42,27 @@ angles = {
 # car mode : 18-8-16
 # spider mode : 15-15-15
 start = {
-    "vertical"                 : 15,
+    "vertical"                 : 13,
     "horizontal_x"             : 15,
     "horizontal_y"             : 15, 
     "x_offset_body"            : 0,
     "y_offset_body"            : -1,
     "initial_z_position_delta" : 10, # 3
+}
+
+modes = {
+    "default":
+        {
+            "vertical"     : 15,
+            "horizontal_x" : 15,
+            "horizontal_y" : 15,           
+        },
+    "speed":
+        {
+            "vertical"     : 18,
+            "horizontal_x" : 8,
+            "horizontal_y" : 16,
+        },
 }
 
 margin = 6

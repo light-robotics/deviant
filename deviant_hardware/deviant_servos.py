@@ -244,6 +244,7 @@ class DeviantServos:
 
         max_angle_diff = max([abs(x) for x in angles_diff.values()])
         self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff.values()])/len(angles_diff)}. Sum : {sum([abs(x) for x in angles_diff.values()])}')
+        self.logger.info(f'Angles diff: {angles_diff}')
         return angles_diff, max_angle_diff
 
     def set_servo_values_paced_full_adjustment(self, angles):
@@ -343,7 +344,7 @@ class DeviantServos:
         
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
-        time.sleep(rate / 1000)
+        time.sleep(rate*1.2 / 1000)
 
         self.logger.info('Function set_servo_values_paced_wo_feedback')
         self.log_movement_result(angles)
