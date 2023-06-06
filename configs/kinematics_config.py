@@ -42,9 +42,9 @@ angles = {
 # car mode : 18-8-16
 # spider mode : 15-15-15
 start = {
-    "vertical"                 : 13,
-    "horizontal_x"             : 15,
-    "horizontal_y"             : 15, 
+    "vertical"                 : 12,
+    "horizontal_x"             : 14,
+    "horizontal_y"             : 14, 
     "x_offset_body"            : 0,
     "y_offset_body"            : -1,
     "initial_z_position_delta" : 10, # 3
@@ -65,7 +65,7 @@ modes = {
         },
 }
 
-margin = 6
+margin = 7
 
 leg_up = {
     1: 4,
