@@ -9,8 +9,8 @@ leg = {
 
 angles = {
     "to_surface": {
-        "min" : -80,
-        "max" : 80,
+        "min" : -20,
+        "max" : 20,
         "step": 5,
         "ideal": 0,
     },
@@ -22,7 +22,7 @@ angles = {
     "beta": {
         "min": -150,
         "max": 0,
-        "ideal": -90,
+        "ideal": -105,
     },
     "gamma": {
         "min": -90,
@@ -42,9 +42,9 @@ angles = {
 # car mode : 18-8-16
 # spider mode : 15-15-15
 start = {
-    "vertical"                 : 12,
-    "horizontal_x"             : 14,
-    "horizontal_y"             : 14, 
+    "vertical"                 : 18,
+    "horizontal_x"             : 8,
+    "horizontal_y"             : 16, 
     "x_offset_body"            : 0,
     "y_offset_body"            : -1,
     "initial_z_position_delta" : 10, # 3

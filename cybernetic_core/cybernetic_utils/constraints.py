@@ -17,7 +17,7 @@ def leg_angles_correct(
     logger = None
     ) -> bool:
     
-    logger.info(f'Trying angles {[alpha, beta, gamma, tetta]}')
+    #logger.info(f'Trying angles {[alpha, beta, gamma, tetta]}')
 
     if tetta is None and alpha is None and beta is None and gamma is None:
         logger.info('All angles provided are None')
@@ -26,22 +26,22 @@ def leg_angles_correct(
     leg_constraints = cfg.angles
     if tetta is not None:
         if not rule_followed(leg_constraints["tetta"], tetta):
-            logger.info(f'Bad tetta : {tetta}')
+            #logger.info(f'Bad tetta : {tetta}')
             return False
     
     if alpha is not None:
         if not rule_followed(leg_constraints["alpha"], alpha):
-            logger.info(f'Bad alpha : {alpha}')
+            #logger.info(f'Bad alpha : {alpha}')
             return False
     
         if not rule_followed(leg_constraints["beta"], beta):
-            logger.info(f'Bad beta : {beta}')
+            #logger.info(f'Bad beta : {beta}')
             return False
     
         if not rule_followed(leg_constraints["gamma"], gamma):
-            logger.info(f'Bad gamma : {gamma}')
+            #logger.info(f'Bad gamma : {gamma}')
             return False
 
 
-    logger.info(f'Good angles : {alpha}, {beta}, {gamma}, {tetta}')
+    #logger.info(f'Good angles : {alpha}, {beta}, {gamma}, {tetta}')
     return True

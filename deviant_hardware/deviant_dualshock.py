@@ -264,7 +264,7 @@ class DeviantDualShock(DualShock):
     def on_square_press(self):
         self.mode = DeviantModes.CLIMBING
         self.neopixel.issue_command('steady', color='blue')    
-        self.command_writer.write_wheels_command('forward', 0)
+        self.command_writer.write_wheels_command('climbing', 0)
         self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to CLIMBING')
     

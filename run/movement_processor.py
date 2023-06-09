@@ -213,7 +213,7 @@ class MovementProcessor:
             self.vd.load_state()
             time.sleep(0.3)
             return
-        self.logger.info(f'MOVE Started')    
+        #self.logger.info(f'MOVE Started')    
         start_time = datetime.datetime.now()
 
         if not code_config.DEBUG:
@@ -221,7 +221,7 @@ class MovementProcessor:
 
         for move_snapshot in sequence:
             angles = move_snapshot.angles_snapshot
-            self.logger.info(f'Moving to {angles}. Move type: {move_snapshot.move_type}')
+            #self.logger.info(f'Moving to {angles}. Move type: {move_snapshot.move_type}')
             if not code_config.DEBUG:
                 move_function(angles)
             else:
