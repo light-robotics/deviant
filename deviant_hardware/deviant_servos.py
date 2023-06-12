@@ -307,7 +307,7 @@ class DeviantServos:
 
         #self.logger.info('Function set_servo_values_paced_full_adjustment')
 
-        #self.log_movement_result(angles, adjusted_angles)
+        self.log_movement_result(angles, adjusted_angles)
 
         #diff_from_target = self.get_angles_diff(angles, current_angles)
         #self.logger.info(f'Final Diff from target: max: {diff_from_target[1]}, {diff_from_target[0]}')
@@ -348,7 +348,7 @@ class DeviantServos:
         time.sleep(rate*1.45 / 1000)
 
         #self.logger.info('Function set_servo_values_paced_wo_feedback')
-        #self.log_movement_result(angles)
+        self.log_movement_result(angles)
     
     def paced_wof_overshoot(self, angles):
         current_angles = self.get_current_angles()
@@ -366,7 +366,7 @@ class DeviantServos:
         #self.logger.info(f'Command sent. Rate: {rate}, angles: {new_target}')
         time.sleep(rate / 1000)
 
-        #self.log_movement_result(angles, new_target)
+        self.log_movement_result(angles, new_target)
     
     def log_movement_result(self, target, adjusted=None):
         current_angles = self.get_current_angles()
