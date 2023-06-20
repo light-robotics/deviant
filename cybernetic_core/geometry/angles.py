@@ -54,7 +54,14 @@ def find_angles(Dx, Dy, logger):
             angle_C = math.acos((b ** 2 + c ** 2 - BD ** 2) / (2 * b * c))
 
             for coef in [-1, 1]:
-                gamma = coef * (math.pi - angle_C)
+                gamma = coef * (math.pi - angle_C)                
+                if ksi < 0:
+                    print(f'Ksi/k: {ksi}/{k}')
+                    wheely_correction = -k/10 * cfg.leg["wheely_angle"] if k > -10 else cfg.leg["wheely_angle"]
+                    print(f'Gamma corrected: {math.degrees(gamma)} -> {math.degrees(gamma) + wheely_correction}')
+                    gamma += math.radians(wheely_correction)
+                else:
+                    print(f'Gamma not corrected: {math.degrees(gamma)}')
 
                 Cx = Bx + b * math.cos(alpha + beta)
                 Cy = By + b * math.sin(alpha + beta)
@@ -236,6 +243,7 @@ def get_best_angles(all_angles):
         raise Exception('No angles')
     best_angles = min(all_angles, key=get_angles_distance)
 
+    print(f'Best angles: {[math.degrees(x) for x in best_angles]}')
     return best_angles
 
 def get_angles_distance(angles):
