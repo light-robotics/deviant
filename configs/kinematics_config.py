@@ -10,14 +10,14 @@ leg = {
 
 angles = {
     "to_surface": {
-        "min" : -45,
-        "max" : 45,
-        "step": 5,
+        "min" : -20,
+        "max" : 20,
+        "step": 2,
         "ideal": 0,
     },
     "alpha": {
         "min": -60,
-        "max": 95,
+        "max": 92,
         "ideal": 60,
     },
     "beta": {
@@ -40,8 +40,9 @@ angles = {
     },
 }
 
-# car mode : 18-8-16
-# spider mode : 15-15-15
+# car mode : 15-8-16
+# spider mode : 13-16-16
+# one legged : 13-14-14
 start = {
     "vertical"                 : 18,
     "horizontal_x"             : 15,
@@ -54,9 +55,9 @@ start = {
 modes = {
     "default":
         {
-            "vertical"     : 15,
-            "horizontal_x" : 15,
-            "horizontal_y" : 15,           
+            "vertical"     : 13,
+            "horizontal_x" : 16,
+            "horizontal_y" : 16,           
         },
     "speed":
         {
@@ -69,7 +70,7 @@ modes = {
 margin = 7
 
 leg_up = {
-    1: 4,
+    1: 6,
     2: 4
 }
 

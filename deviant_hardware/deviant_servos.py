@@ -345,7 +345,7 @@ class DeviantServos:
         
         self.send_command_to_servos(angles, rate)
         #self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
-        time.sleep(rate*1.45 / 1000)
+        time.sleep(rate*1.5 / 1000)
 
         #self.logger.info('Function set_servo_values_paced_wo_feedback')
         self.log_movement_result(angles)
@@ -370,12 +370,15 @@ class DeviantServos:
     
     def log_movement_result(self, target, adjusted=None):
         current_angles = self.get_current_angles()
+        all_diffs = []
         for k, v in target.items():
+            diff = v - current_angles[k]
+            all_diffs.append(abs(diff))
             if adjusted:
-                self.logger.info(f'Angle {k}. Current: {current_angles[k]}. Target: {v}. Adjusted: {adjusted[k]}')
+                self.logger.info(f'Angle {k:>10}. Diff: {diff:5.2f}. Current: {current_angles[k]}. Target: {v}. Adjusted: {adjusted[k]}')
             else:
-                self.logger.info(f'Angle {k}. Current: {current_angles[k]}. Target: {v}.')
-
+                self.logger.info(f'Angle {k:>10}. Diff: {diff:5.2f}. Current: {current_angles[k]}. Target: {v}.')
+        self.logger.info(f'Diff. Sum: {sum(all_diffs):3.2f}. Max: {max(all_diffs):3.2f}')
 
 if __name__ == '__main__':
     dvnt = DeviantServos()

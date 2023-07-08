@@ -55,13 +55,6 @@ def find_angles(Dx, Dy, logger):
 
             for coef in [-1, 1]:
                 gamma = coef * (math.pi - angle_C)                
-                if ksi < 0:
-                    print(f'Ksi/k: {ksi}/{k}')
-                    wheely_correction = -k/10 * cfg.leg["wheely_angle"] if k > -10 else cfg.leg["wheely_angle"]
-                    print(f'Gamma corrected: {math.degrees(gamma)} -> {math.degrees(gamma) + wheely_correction}')
-                    gamma += math.radians(wheely_correction)
-                else:
-                    print(f'Gamma not corrected: {math.degrees(gamma)}')
 
                 Cx = Bx + b * math.cos(alpha + beta)
                 Cy = By + b * math.sin(alpha + beta)
@@ -70,7 +63,15 @@ def find_angles(Dx, Dy, logger):
                 if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
                     continue
                     # only one of two coeffs is correct
-                
+
+                if ksi < 0:
+                    print(f'Ksi/k: {ksi}/{k}')
+                    wheely_correction = -k/10 * cfg.leg["wheely_angle"] if k > -10 else cfg.leg["wheely_angle"]
+                    print(f'Gamma corrected: {math.degrees(gamma)} -> {math.degrees(gamma) + wheely_correction}')
+                    gamma += math.radians(wheely_correction)
+                else:
+                    print(f'Gamma not corrected: {math.degrees(gamma)}')
+
                 if leg_angles_correct(
                     alpha=math.degrees(alpha), 
                     beta=math.degrees(beta), 

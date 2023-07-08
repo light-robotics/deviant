@@ -175,7 +175,7 @@ class DeviantDualShock(DualShock):
         if self.mode in [DeviantModes.RUN, DeviantModes.TURN]:
             self.command_writer.write_command('forward_two_legged', 200)
         elif self.mode in [DeviantModes.CLIMBING]:
-            self.command_writer.write_command('forward_one_legged', 500)
+            self.command_writer.write_command('forward_one_legged', 750)
         #elif self.mode in [DeviantModes.BATTLE]:
         #    self.command_writer.write_command('spear_up', 500)
 
