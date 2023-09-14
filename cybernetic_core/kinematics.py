@@ -185,7 +185,10 @@ class DeviantKinematics:
         self.reset()
         self.body_movement(0, 0, -cfg.start["vertical"] + 
                                   cfg.start["initial_z_position_delta"])
-            
+
+    def go_to_height(self, height):
+        delta_z = self.legs[1].O.z - self.legs[1].D.z - height
+        self.body_movement(0, 0, -delta_z)
 
     def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=cfg.start["x_offset_body"]):
         # move body to center
@@ -292,6 +295,49 @@ class DeviantKinematics:
         self.logger.info(f'Processing body to center')
         self.body_to_center()
 
+    def two_legged_climbing_1(self, delta_x: int = 0, delta_y: int = 0):
+        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+
+        self.legs[1].move_end_point(delta_x, delta_y, 2*cfg.leg_up[2])
+        self.legs[3].move_end_point(delta_x, delta_y, cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+
+        for leg in [self.legs[1], self.legs[3]]:
+            leg.move_end_point(0, 0, -cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+
+        self.legs[2].move_end_point(delta_x, delta_y, cfg.leg_up[2])
+        self.legs[4].move_end_point(delta_x, delta_y, 2*cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+
+        for leg in [self.legs[2], self.legs[4]]:
+            leg.move_end_point(0, 0, -cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+        
+        self.body_movement(0, 0, cfg.leg_up[2])
+
+    def two_legged_climbing_2(self, delta_x: int = 0, delta_y: int = 0):
+        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+
+        self.legs[1].move_end_point(delta_x, delta_y, cfg.leg_up[2])
+        self.legs[3].move_end_point(delta_x, delta_y, 2*cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+
+        for leg in [self.legs[1], self.legs[3]]:
+            leg.move_end_point(0, 0, -cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+
+        self.legs[2].move_end_point(delta_x, delta_y, 2*cfg.leg_up[2])
+        self.legs[4].move_end_point(delta_x, delta_y, cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+
+        for leg in [self.legs[2], self.legs[4]]:
+            leg.move_end_point(0, 0, -cfg.leg_up[2])
+        self.add_angles_snapshot('endpoints')
+
+
     """
     Two phased moves
     """
@@ -341,43 +387,55 @@ class DeviantKinematics:
         self.add_angles_snapshot('endpoints')
         self.logger.info(f'Legs 1-3 down')
 
-    def climb_obstacle(self, step_len=10, obstacle_z=10):
-        #step_len = 10
-        #obstacle_z = 13
-        #self.body_movement(0, 0, obstacle_z)
+    def climb_obstacle(self, step_len=8, obstacle_z=12):
+        # self.body_movement(0, 0, obstacle_z)
 
-        #self.compensated_leg_movement(1, [0, 0, cfg.leg_up[1] + obstacle_z])
-        #self.compensated_leg_movement(1, [0, 0, cfg.leg_up[1]])
-        self.body_movement(-5.31, -3.56, 0)
-        return
+        self.compensated_leg_movement(1, [0, 0, obstacle_z+3])
         self.legs[1].move_end_point(0, step_len, 0)
         self.add_angles_snapshot('endpoint')
-        self.legs[1].move_end_point(0, 0, -cfg.leg_up[1])
+        self.legs[1].move_end_point(0, 0, -3)
         self.add_angles_snapshot('endpoint')
 
-        """
-        self.compensated_leg_movement(4, [0, 0, cfg.leg_up[1] + obstacle_z])
-        self.legs[4].move_end_point(0, step_len, 0)
+        self.climb_obstacle_4()
+
+    def climb_obstacle_4(self, step_len=8, obstacle_z=12):
+        delta = 0
+        self.compensated_leg_movement(4, [-delta, -delta, obstacle_z+3])
+        self.legs[4].move_end_point(0 + delta, step_len, 0)
         self.add_angles_snapshot('endpoint')
-        self.legs[4].move_end_point(0, 0, -cfg.leg_up[1])
+        self.legs[4].move_end_point(0, 0, -3)
         self.add_angles_snapshot('endpoint')
 
+        self.climb_obstacle_2()
+
+    def climb_obstacle_3(self, step_len=8, obstacle_z=12):
+        #self.compensated_leg_movement(3, [0, 0, obstacle_z+3])
         self.body_to_center()
-        self.body_movement(0, step_len, 0)
-        """
-
-    def climb_obstacle_2(self, step_len=10, obstacle_z=10):
-        #self.legs[1].move_end_point(0, 0, cfg.leg_up[1])
-        #self.add_angles_snapshot('endpoint')
-        #self.legs[1].move_end_point(0, -step_len, 0)
-        #self.add_angles_snapshot('endpoint')
-        #self.legs[1].move_end_point(0, 0, -cfg.leg_up[1] - obstacle_z)
-        
-        #self.legs[1].move_end_point(0, 0, -cfg.leg_up[1])
-        #self.add_angles_snapshot('endpoint')
-
+        self.logger.info('wtf4')
+        self.body_movement(3, 3, 0)
+        self.logger.info('wtf5')
+        self.legs[3].move_end_point(0, 0, obstacle_z+3)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info('wtf6')
+        self.legs[3].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info('wtf7')
+        self.legs[3].move_end_point(0, 0, -3)
+        self.add_angles_snapshot('endpoint')
         self.body_to_center()
-        #self.body_movement(0, 0, -obstacle_z)
+    
+    def climb_obstacle_2(self, step_len=8, obstacle_z=12):
+        self.logger.info('wtf0')
+        self.compensated_leg_movement(2, [0, 0, obstacle_z+3])
+        self.logger.info('wtf1')
+        self.legs[2].move_end_point(0, step_len, 0)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info('wtf2')
+        self.legs[2].move_end_point(0, 0, -3)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info('wtf3')
+
+        self.climb_obstacle_3()
 
     def spear_up(self):
         self.leg_move_with_compensation(4, 12, 0)

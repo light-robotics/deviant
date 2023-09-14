@@ -201,23 +201,23 @@ class DeviantDualShock(DualShock):
 
     def on_right_arrow_press(self):
         if self.mode in [DeviantModes.MOVE_BODY]:
-            self.command_writer.write_command('body_right', 500)
+            self.command_writer.write_command('body_right', 800)
         elif self.mode in [DeviantModes.OBSTACLES]:
             self.command_writer.write_command('reposition_wider_8', 500)
         elif self.mode in [DeviantModes.CLIMBING]:
-            self.command_writer.write_command('climb_2', 1000)
+            self.command_writer.write_command('climb_2', 350)
 
     def on_left_arrow_press(self):
         if self.mode in [DeviantModes.MOVE_BODY]:
-            self.command_writer.write_command('body_left', 500)
+            self.command_writer.write_command('body_left', 800)
         elif self.mode in [DeviantModes.OBSTACLES]:
             self.command_writer.write_command('reposition_narrower_8', 500)
         elif self.mode in [DeviantModes.CLIMBING]:
-            self.command_writer.write_command('climb_1', 1000)
+            self.command_writer.write_command('climb_1', 350)
       
     def on_up_arrow_press(self):
         if self.mode in [DeviantModes.MOVE_BODY]:
-            self.command_writer.write_command('body_forward', 500)
+            self.command_writer.write_command('body_forward', 800)
         else:
             self.command_writer.write_command('up', 1000)
         #elif self.mode == DeviantModes.TURN:
@@ -227,7 +227,7 @@ class DeviantDualShock(DualShock):
 
     def on_down_arrow_press(self):
         if self.mode in [DeviantModes.MOVE_BODY]:
-            self.command_writer.write_command('body_backward', 500)
+            self.command_writer.write_command('body_backward', 800)
         else:
             self.command_writer.write_command('down', 1000)
         #elif self.mode == DeviantModes.TURN:
@@ -240,9 +240,10 @@ class DeviantDualShock(DualShock):
         self.command_writer.write_command('none', 500)  
         
     def on_x_press(self):
-        self.mode = DeviantModes.BATTLE
-        self.neopixel.issue_command('steady', color='purple')
-        self.command_writer.write_wheels_command('climbing', 0)
+        self.mode = DeviantModes.OBSTACLES
+        self.neopixel.issue_command('steady', color='green')
+        self.command_writer.write_wheels_command('forward', 0)
+        #self.command_writer.write_wheels_command('forward', 0)
         self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to OBSTACLES')
 
@@ -253,15 +254,6 @@ class DeviantDualShock(DualShock):
         self.command_writer.write_command('actualize_wheels', 300)
         print('Switched mode to RUN')
 
-    """
-    def on_circle_press(self):
-        self.mode = DeviantModes.OBSTACLES
-        self.neopixel.issue_command('steady', color='green')
-        self.command_writer.write_wheels_command('turn', 0)
-        #self.command_writer.write_wheels_command('forward', 0)
-        self.command_writer.write_command('actualize_wheels', 300)
-        print('Switched mode to OBSTACLES')
-    """
     def on_circle_press(self):
         self.mode = DeviantModes.TURN
         self.neopixel.issue_command('steady', color='green')

@@ -171,7 +171,7 @@ class DeviantServos:
             #self.lock_motors()
             return
         elif command in ('climbing'):
-            self.wheels_direction = WheelsDirection.WALK
+            self.wheels_direction = WheelsDirection.FORWARD
             #speed = 0
             #self.lock_motors()
             return
@@ -206,11 +206,15 @@ class DeviantServos:
 
         self.logger.info(f'Motors hardlocked')
         for id in self.motor_ids:
+            # self.get_board_by_id(id).motor_or_servo(id, 1, 50)
+            # self.logger.info(f'{id} locked')
+            
             self.get_board_by_id(id).motor_or_servo(id, 0, 0)
             time.sleep(0.005)
             current_angle = self.get_board_by_id(id).read_angle(id)
-            #self.logger.info(f'{id} lock angle: {current_angle}')
+            # self.logger.info(f'{id} lock angle: {current_angle}')
             self.get_board_by_id(id).move_servo_to_angle(id, current_angle, 200)
+            
         self.motors_locked = True
         #self.logger.info(f'lock_motors self.motors_locked set to {self.motors_locked}')
     
