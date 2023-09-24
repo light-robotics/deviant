@@ -25,22 +25,22 @@ class WheelsDirection(Enum):
     NEUTRAL        = 7
 
 servos_to_angles_mapping = {
-    2  : "leg1_delta",
+    # 2  : "leg1_delta",
     3  : "leg1_gamma",
     4  : "leg1_beta",
     5  : "leg1_alpha",
     6  : "leg1_tetta",
-    8  : "leg2_delta",
+    # 8  : "leg2_delta",
     9  : "leg2_gamma",
     10 : "leg2_beta",
     11 : "leg2_alpha",
     12 : "leg2_tetta",
-    14 : "leg3_delta",
+    # 14 : "leg3_delta",
     15 : "leg3_gamma",
     16 : "leg3_beta",
     17 : "leg3_alpha",
     18 : "leg3_tetta",
-    20 : "leg4_delta",
+    # 20 : "leg4_delta",
     21 : "leg4_gamma",
     22 : "leg4_beta",
     23 : "leg4_alpha",
@@ -87,7 +87,7 @@ class DeviantServos:
         # 0.18 sec / 60 degrees for 6V+
         # my max speed is for 45 degrees
         # that means that max speed should be 120 for 7.4V+ and 135 for 6V+
-        self.servo_ids = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24]
+        self.servo_ids = [3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 21, 22, 23, 24]
         self.motor_ids = [1, 7, 13, 19]
 
     def get_board_by_id(self, id: int) -> LX16A:
@@ -137,8 +137,8 @@ class DeviantServos:
         return adapted_angles
 
     def send_command_to_servos(self, angles, rate=1000):
-        adapted_angles = self.adapt_delta_angle(angles)
-        angles_converted = convert_kinematic_angles_to_ids(adapted_angles)
+        #adapted_angles = self.adapt_delta_angle(angles)
+        angles_converted = convert_kinematic_angles_to_ids(angles)
         #self.logger.info(f'DS. send_command_to_servos. {angles_converted, rate}')
         for id in self.servo_ids:
             self.get_board_by_id(id).move_servo_to_angle(id, angles_converted[id], rate)

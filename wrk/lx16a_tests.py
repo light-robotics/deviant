@@ -72,11 +72,11 @@ if __name__ == '__main__':
 
     for i in [3, 4, 5, 21, 22, 23]:
         m1.read_values(i)
-    for i in [1, 2, 6, 7, 8, 12]:
+    for i in [6, 12]:
         m2.read_values(i)
     for i in [9, 10, 11, 15, 16, 17]:
         m3.read_values(i)
-    for i in [13, 14, 18, 19, 20, 24]:
+    for i in [18, 24]:
         m4.read_values(i)
     
 

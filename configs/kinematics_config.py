@@ -1,11 +1,11 @@
 leg = {
-    "a": 7.4,    # PointA to PointB - femur
+    "a": 7.8,    # PointA to PointB - femur
     "b": 8,    # PointB to PointC - femur-tibia
-    "c": 16.1,   # PointC to PointD - tibia / point toe length
+    "c": 12.5,   # PointC to PointD - tibia / point toe length
     "d": 7.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 5.16,
     "phi_angle" : 0, # angle correction if leg is not straight
-    "wheely_angle" : -26, # 26, # angle correction for the wheel block
+    "wheely_angle" : 0, #-26, # 26, # angle correction for the wheel block
 }
 
 angles = {
@@ -44,11 +44,11 @@ angles = {
 # spider mode : 13-16-16
 # one legged : 13-14-14
 start = {
-    "vertical"                 : 18,
+    "vertical"                 : 15,
     "horizontal_x"             : 15,
     "horizontal_y"             : 15, 
     "x_offset_body"            : 0,
-    "y_offset_body"            : -1,
+    "y_offset_body"            : 0,
     "initial_z_position_delta" : 10, # 3
 }
 
@@ -67,11 +67,11 @@ modes = {
         },
 }
 
-margin = 7
+margin = 5
 
 leg_up = {
-    1: 6,
-    2: 5
+    1: 5,
+    2: 3
 }
 
 # movements
