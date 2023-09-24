@@ -186,7 +186,14 @@ class MovementProcessor:
         if command in ['forward_one_legged']:
             self.logger.info('Using function set_servo_values_paced_full_adjustment')
             return self.ds.set_servo_values_paced_full_adjustment
-        elif command in ['forward_1', 'forward_2', 'forward_3', 'forward_22', 'forward_32']:
+        elif command in [
+            'forward_1', 
+            'forward_2', 
+            'forward_3', 
+            'forward_22', 
+            'forward_32', 
+            'reposition_narrower_8',
+            'legs_up_down']:
             self.logger.info('Using function set_servo_values_paced_wo_feedback')
             return self.ds.set_servo_values_paced_wo_feedback
         else:

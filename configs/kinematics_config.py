@@ -71,7 +71,7 @@ margin = 7
 
 leg_up = {
     1: 6,
-    2: 4
+    2: 5
 }
 
 # movements

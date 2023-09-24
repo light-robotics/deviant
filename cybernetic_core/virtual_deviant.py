@@ -69,9 +69,15 @@ class VirtualDeviant(DeviantKinematics):
         elif command == 'down_6':
             self.body_movement(0, 0, -6)
         elif command == 'climb_1':
-            self.two_legged_climbing_1(0, FORWARD_LEGS_2LEG_CM)
+            #self.two_legged_climbing_1(0, FORWARD_LEGS_2LEG_CM)
+            self.climb_obstacle_1()
         elif command == 'climb_2':
-            self.two_legged_climbing_2(0, FORWARD_LEGS_2LEG_CM)
+            #self.two_legged_climbing_2(0, FORWARD_LEGS_2LEG_CM)
+            self.climb_obstacle_4()
+        elif command == 'climb_3':
+            self.climb_obstacle_2()
+        elif command == 'climb_4':
+            self.climb_obstacle_3()
         elif command == 'spear_up':
             self.spear_up()
         elif command == 'spear_down':

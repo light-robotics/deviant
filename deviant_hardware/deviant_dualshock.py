@@ -27,6 +27,7 @@ class DeviantDualShock(DualShock):
         self.connect()
         self.light_on = False
         self.wheels_locked = False
+        self.climing_mode = 0
         self.mode = DeviantModes.RUN
         self.command_writer = CommandsWriter()
 
@@ -213,7 +214,18 @@ class DeviantDualShock(DualShock):
         elif self.mode in [DeviantModes.OBSTACLES]:
             self.command_writer.write_command('reposition_narrower_8', 500)
         elif self.mode in [DeviantModes.CLIMBING]:
-            self.command_writer.write_command('climb_1', 350)
+            if self.climing_mode == 0:
+                self.climing_mode = 1
+                self.command_writer.write_command('climb_1', 700)
+            elif self.climing_mode == 1:
+                self.climing_mode = 2
+                self.command_writer.write_command('climb_2', 700)
+            elif self.climing_mode == 2:
+                self.climing_mode = 3
+                self.command_writer.write_command('climb_3', 700)
+            elif self.climing_mode == 3:
+                self.climing_mode = 0
+                self.command_writer.write_command('climb_4', 700)
       
     def on_up_arrow_press(self):
         if self.mode in [DeviantModes.MOVE_BODY]:
