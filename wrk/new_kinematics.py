@@ -11,13 +11,66 @@ if __name__ == '__main__':
     m3 = LX16A(Port='/dev/ttyAMA3') # 13-18
     m4 = LX16A(Port='/dev/ttyAMA1') # 19-24
     
-    time.sleep(2.0)
+    
+    # time.sleep(2.0)
     angle0 = 0
     m1.move_servo_to_angle(11, angle0, 1000)
     m2.move_servo_to_angle(17, angle0, 1000)
     m3.move_servo_to_angle(23, angle0, 1000)
     m4.move_servo_to_angle(5, angle0, 1000)
     
+    alpha1, beta1 = leg_angles(9, 0)
+    alpha2, beta2 = leg_angles(13, 0)
+
+    spd = 1000
+
+    m1.move_servo_to_angle(10, alpha2, spd)
+    m2.move_servo_to_angle(16, alpha2, spd)
+    m3.move_servo_to_angle(22, alpha2, spd)
+    m4.move_servo_to_angle(4, alpha2, spd)
+
+    m1.move_servo_to_angle(9, beta2, spd)
+    m2.move_servo_to_angle(15, beta2, spd)
+    m3.move_servo_to_angle(21, beta2, spd)
+    m4.move_servo_to_angle(3, beta2, spd)
+
+    time.sleep(1)
+
+    spd = 300
+    m1.move_servo_to_angle(10, alpha2, spd)
+    m2.move_servo_to_angle(16, alpha1, spd)
+    m3.move_servo_to_angle(22, alpha2, spd)
+    m4.move_servo_to_angle(4, alpha1, spd)
+
+    m1.move_servo_to_angle(9, beta2, spd)
+    m2.move_servo_to_angle(15, beta1, spd)
+    m3.move_servo_to_angle(21, beta2, spd)
+    m4.move_servo_to_angle(3, beta1, spd)
+
+    time.sleep(0.3)
+    m1.move_servo_to_angle(10, alpha1, spd)
+    m2.move_servo_to_angle(16, alpha2, spd)
+    m3.move_servo_to_angle(22, alpha1, spd)
+    m4.move_servo_to_angle(4, alpha2, spd)
+
+    m1.move_servo_to_angle(9, beta1, spd)
+    m2.move_servo_to_angle(15, beta2, spd)
+    m3.move_servo_to_angle(21, beta1, spd)
+    m4.move_servo_to_angle(3, beta2, spd)
+    time.sleep(0.3)
+
+    m1.move_servo_to_angle(10, alpha2, spd)
+    m2.move_servo_to_angle(16, alpha2, spd)
+    m3.move_servo_to_angle(22, alpha2, spd)
+    m4.move_servo_to_angle(4, alpha2, spd)
+
+    m1.move_servo_to_angle(9, beta2, spd)
+    m2.move_servo_to_angle(15, beta2, spd)
+    m3.move_servo_to_angle(21, beta2, spd)
+    m4.move_servo_to_angle(3, beta2, spd)
+    time.sleep(0.3)
+    """
+    # Jump attempt
     spd = 0
     alpha1, beta1 = leg_angles(18, 0)
     m1.move_servo_to_angle(10, alpha1, spd)
@@ -47,6 +100,7 @@ if __name__ == '__main__':
     m4.move_servo_to_angle(3, beta2, spd2)
     
     time.sleep(1)
+    """
     
     for i in [9, 10, 11]:
         m1.read_values(i)
