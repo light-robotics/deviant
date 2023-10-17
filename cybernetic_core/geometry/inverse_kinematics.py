@@ -1,10 +1,16 @@
 import math
+import sys
+import os
 
-a = 8
-b = 12.3
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import configs.kinematics_config as cfg
+from cybernetic_core.geometry.lines import Point
 
-d = 5
-d2 = 4.5
+a = cfg.leg.a
+b = cfg.leg.b
+
+d = cfg.leg.d
+d2 = cfg.leg.d2
 
 
 def leg_angles(Cx: float, Cy: float) -> [float, float]:
@@ -57,7 +63,6 @@ def get_knee_angles(Cx, Cz):
     return alpha, beta
 
 def get_leg_angles(Cx, Cy, Cz):
-
     # hip joint operates in Cy, Cz plane
     # the rest of the leg operates in Cx, Cz plane
 
@@ -76,4 +81,5 @@ def get_leg_angles(Cx, Cy, Cz):
         round(math.degrees(alpha), 2), 
         round(math.degrees(beta), 2)]
 
-
+def calculate_leg_angles(O: Point, C: Point):
+    return get_leg_angles(C.x - O.x, C.y - O.y, C.z - O.z)

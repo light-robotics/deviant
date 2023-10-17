@@ -2,7 +2,7 @@ import time
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from hardware.lx16a import LX16A, read_all_servos, read_values
+from hardware.lx16a import LX16A
 from cybernetic_core.geometry.inverse_kinematics import get_leg_angles
 
 if __name__ == '__main__':      
@@ -12,41 +12,45 @@ if __name__ == '__main__':
     m4 = LX16A(Port='/dev/ttyAMA1') # 19-24
     
     
-    gamma1, alpha1, beta1 = get_leg_angles(0, 15, 22)
+    gamma1, alpha1, beta1 = get_leg_angles(5, 5, 15)
     gamma2, alpha2, beta2 = get_leg_angles(0, 5, 15)
 
     # time.sleep(2.0)
-    #m1.move_servo_to_angle(11, angle0, 1000)
-    #m2.move_servo_to_angle(17, angle0, 1000)
-    #m3.move_servo_to_angle(23, angle0, 1000)
+    
     spd = 1000
 
     m4.move_servo_to_angle(5, gamma1, spd)
+    m1.move_servo_to_angle(11, gamma1, spd)
+    m2.move_servo_to_angle(17, gamma1, spd)
+    m3.move_servo_to_angle(23, gamma1, spd)
 
-    #m1.move_servo_to_angle(10, alpha2, spd)
-    #m2.move_servo_to_angle(16, alpha2, spd)
-    #m3.move_servo_to_angle(22, alpha2, spd)
+    m2.move_servo_to_angle(16, alpha1, spd)
+    m3.move_servo_to_angle(22, alpha1, spd)
     m4.move_servo_to_angle(4, alpha1, spd)
+    m1.move_servo_to_angle(10, alpha1, spd)
 
-    #m1.move_servo_to_angle(9, beta2, spd)
-    #m2.move_servo_to_angle(15, beta2, spd)
-    #m3.move_servo_to_angle(21, beta2, spd)
+    m2.move_servo_to_angle(15, beta1, spd)
+    m3.move_servo_to_angle(21, beta1, spd)
     m4.move_servo_to_angle(3, beta1, spd)
+    m1.move_servo_to_angle(9, beta1, spd)
 
     time.sleep(1)
 
     spd = 1000
-    m4.move_servo_to_angle(5, gamma2, 1000)
+    m4.move_servo_to_angle(5, gamma2, spd)
+    m1.move_servo_to_angle(11, gamma2, spd)
+    m2.move_servo_to_angle(17, gamma2, spd)
+    m3.move_servo_to_angle(23, gamma2, spd)
 
-    #m1.move_servo_to_angle(10, alpha2, spd)
-    #m2.move_servo_to_angle(16, alpha1, spd)
-    #m3.move_servo_to_angle(22, alpha2, spd)
+    m2.move_servo_to_angle(16, alpha2, spd)
+    m3.move_servo_to_angle(22, alpha2, spd)
     m4.move_servo_to_angle(4, alpha2, spd)
+    m1.move_servo_to_angle(10, alpha2, spd)
 
-    #m1.move_servo_to_angle(9, beta2, spd)
-    #m2.move_servo_to_angle(15, beta1, spd)
-    #m3.move_servo_to_angle(21, beta2, spd)
+    m2.move_servo_to_angle(15, beta2, spd)
+    m3.move_servo_to_angle(21, beta2, spd)
     m4.move_servo_to_angle(3, beta2, spd)
+    m1.move_servo_to_angle(9, beta2, spd)
 
     time.sleep(1)
     """
