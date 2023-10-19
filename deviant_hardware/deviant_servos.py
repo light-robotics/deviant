@@ -14,37 +14,22 @@ import configs.code_config as code_config
 import logging.config
 logging.config.dictConfig(code_config.logger_config)
 
+from cybernetic_core.hh_kinematics import HHKinematics
 
-class WheelsDirection(Enum):
-    FORWARD        = 1
-    TURN           = 2
-    WALK           = 3
-    SIDEWAYS       = 4
-    DIAGONAL_RIGHT = 5
-    DIAGONAL_LEFT  = 6
-    NEUTRAL        = 7
 
 servos_to_angles_mapping = {
-    # 2  : "leg1_delta",
-    3  : "leg1_gamma",
-    4  : "leg1_beta",
-    5  : "leg1_alpha",
-    6  : "leg1_tetta",
-    # 8  : "leg2_delta",
-    9  : "leg2_gamma",
-    10 : "leg2_beta",
-    11 : "leg2_alpha",
-    12 : "leg2_tetta",
-    # 14 : "leg3_delta",
-    15 : "leg3_gamma",
-    16 : "leg3_beta",
-    17 : "leg3_alpha",
-    18 : "leg3_tetta",
-    # 20 : "leg4_delta",
-    21 : "leg4_gamma",
-    22 : "leg4_beta",
-    23 : "leg4_alpha",
-    24 : "leg4_tetta",
+    3  : "leg1_beta",
+    4  : "leg1_alpha",
+    5  : "leg1_tetta",
+    9  : "leg2_beta",
+    10 : "leg2_alpha",
+    11 : "leg2_tetta",
+    15 : "leg3_beta",
+    16 : "leg3_alpha",
+    17 : "leg3_tetta",
+    21 : "leg4_beta",
+    22 : "leg4_alpha",
+    23 : "leg4_tetta",
 }
 
 def convert_kinematic_angles_to_ids(angles: Dict[str, Dict[str, float]]) -> Dict[id, float]:
@@ -66,7 +51,7 @@ def target_overshoot(current: float, target: float) -> float:
 
     return target + overshoot_value
 
-class DeviantServos:
+class HellHoundServos:
     def __init__(self):
         self.m1 = LX16A(Port='/dev/ttyAMA0') # 5-8   # 1-4
         self.m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
@@ -75,8 +60,6 @@ class DeviantServos:
         self.speed = 500
         self.min_speed = 700
         self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
-        self.wheels_direction = WheelsDirection.FORWARD
-        self.motors_locked = False
 
         self.diff_from_target_limit = config.deviant["servos"]["diff_from_target_limit"] # when it's time to start next movement
         self.diff_from_prev_limit = config.deviant["servos"]["diff_from_prev_limit"] # 1.0 # start next movement if we're stuck
@@ -87,17 +70,16 @@ class DeviantServos:
         # 0.18 sec / 60 degrees for 6V+
         # my max speed is for 45 degrees
         # that means that max speed should be 120 for 7.4V+ and 135 for 6V+
-        self.servo_ids = [3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 21, 22, 23, 24]
-        self.motor_ids = [1, 7, 13, 19]
+        self.servo_ids = [3, 4, 5, 9, 10, 11, 15, 16, 17, 21, 22, 23]
 
     def get_board_by_id(self, id: int) -> LX16A:
-        if id in [3, 4, 5, 21, 22, 23]:
+        if id in [9, 10, 11]:
             return self.m1
-        if id in [1, 2, 6, 7, 8, 12]:
+        if id in [15, 16, 17]:
             return self.m2
-        if id in [9, 10, 11, 15, 16, 17]:
+        if id in [21, 22, 23]:
             return self.m3
-        if id in [13, 14, 18, 19, 20, 24]:
+        if id in [3, 4, 5]:
             return self.m4
 
     def get_current_angles(self) -> Dict[int, float]:
@@ -107,123 +89,12 @@ class DeviantServos:
             current_angles[angle_name] = self.get_board_by_id(id).read_angle(id)
         return current_angles
 
-    def adapt_delta_angle(self, angles: Dict[str, Dict[str, float]]) -> Dict[str, Dict[str, float]]:
-        adapted_angles = {**angles}
-        if self.wheels_direction == WheelsDirection.FORWARD:
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 45
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 45
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 45
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] + 45
-        elif self.wheels_direction == WheelsDirection.SIDEWAYS:
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 45
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 45
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 45
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 45
-        elif self.wheels_direction in [WheelsDirection.TURN, WheelsDirection.WALK]:
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] - 75
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] + 75
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] - 75
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] + 75
-        elif self.wheels_direction == WheelsDirection.NEUTRAL:
-            adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"]
-            adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"]
-            adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"]
-            adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"]
-        #elif self.wheels_direction == WheelsDirection.WALK:
-        #    adapted_angles["leg1_delta"] = adapted_angles["leg1_tetta"] + 120
-        #    adapted_angles["leg2_delta"] = adapted_angles["leg2_tetta"] - 120
-        #    adapted_angles["leg3_delta"] = adapted_angles["leg3_tetta"] + 120
-        #    adapted_angles["leg4_delta"] = adapted_angles["leg4_tetta"] - 120
-        return adapted_angles
-
     def send_command_to_servos(self, angles, rate=1000):
         #adapted_angles = self.adapt_delta_angle(angles)
         angles_converted = convert_kinematic_angles_to_ids(angles)
         #self.logger.info(f'DS. send_command_to_servos. {angles_converted, rate}')
         for id in self.servo_ids:
             self.get_board_by_id(id).move_servo_to_angle(id, angles_converted[id], rate)
-
-    def send_command_to_motors(self, speeds: List[float] = [1000, 1000, 1000, 1000], duration: int = 0):
-        #self.logger.info(f'DS. send_command_to_motors. {speeds, duration}')
-        for id, speed in zip(self.motor_ids, speeds):
-            self.get_board_by_id(id).motor_or_servo(id, 1, round(speed))
-
-        assert duration < 10
-        if duration > 0:
-            time.sleep(duration)
-            for id in self.motor_ids:
-                self.get_board_by_id(id).motor_or_servo(id, 1, 0)
-
-    def process_motors_command(self, command, speed):
-        if command in ('forward', 'backwards', 'forward_4'):
-            self.wheels_direction = WheelsDirection.FORWARD
-        elif command in ('turn', 'turn_ccw'):
-            self.wheels_direction = WheelsDirection.TURN
-        elif command in ('walking'):
-            self.wheels_direction = WheelsDirection.WALK
-            #speed = 0
-            #self.lock_motors()
-            return
-        elif command in ('neutral'):
-            #self.wheels_direction = WheelsDirection.NEUTRAL
-            self.wheels_direction = WheelsDirection.WALK
-            #speed = 0
-            #self.lock_motors()
-            return
-        elif command in ('climbing'):
-            self.wheels_direction = WheelsDirection.FORWARD
-            #speed = 0
-            #self.lock_motors()
-            return
-        elif command in ['lock_wheels', 'unlock_wheels']:
-            self.logger.info('Will be processed separately')
-        else:
-            print(f'Unknown command {command}')
-            return
-
-        if command == 'lock_wheels':
-            self.lock_motors()
-            return
-        elif command == 'unlock_wheels':
-            self.unlock_motors()
-            return
-        elif self.motors_locked:
-            self.logger.info(f'Got command {command}. Ignoring: motors locked.')
-            return
-
-        if command in ['backwards', 'turn_ccw']:
-            speed = -speed
-
-        if command in ['turn', 'turn_ccw']:
-            self.send_command_to_motors([speed, speed, speed, speed])
-        elif command == 'forward_2':
-            self.send_command_to_motors([-speed, -speed, speed, speed], 2)
-        else:
-            self.send_command_to_motors([-speed, -speed, speed, speed])
-
-    def lock_motors(self):
-        # self.send_command_to_motors([0, 0, 0, 0])
-
-        self.logger.info(f'Motors hardlocked')
-        for id in self.motor_ids:
-            # self.get_board_by_id(id).motor_or_servo(id, 1, 50)
-            # self.logger.info(f'{id} locked')
-            
-            self.get_board_by_id(id).motor_or_servo(id, 0, 0)
-            time.sleep(0.005)
-            current_angle = self.get_board_by_id(id).read_angle(id)
-            # self.logger.info(f'{id} lock angle: {current_angle}')
-            self.get_board_by_id(id).move_servo_to_angle(id, current_angle, 200)
-            
-        self.motors_locked = True
-        #self.logger.info(f'lock_motors self.motors_locked set to {self.motors_locked}')
-    
-    def unlock_motors(self):
-        #self.logger.info(f'Motors unlocked')
-        for id in self.motor_ids:
-            self.get_board_by_id(id).motor_or_servo(id, 1, 0)
-        self.motors_locked = False
-        #self.logger.info(f'unlock_motors self.motors_locked set to {self.motors_locked}')
 
     def print_status(self):
         j = 1
@@ -236,7 +107,7 @@ class DeviantServos:
         if new_speed > 10000 or new_speed < self.max_speed:
             raise Exception(f'Invalid speed value {new_speed}. Should be between {self.max_speed} and 10000')
         self.speed = new_speed
-        #self.logger.info(f'DeviantServos. Speed set to {self.speed}')
+        #self.logger.info(f'HellHoundServos. Speed set to {self.speed}')
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:
@@ -385,41 +256,30 @@ class DeviantServos:
         self.logger.info(f'Diff. Sum: {sum(all_diffs):3.2f}. Max: {max(all_diffs):3.2f}')
 
 if __name__ == '__main__':
-    dvnt = DeviantServos()
+    hh = HellHoundServos()
         
-    """
-    dvnt.set_speed(3000)
-    dvnt.wheels_direction = WheelsDirection.WALK
-    dvnt.send_command_to_motors(-1000)
-    angles = {'leg1': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg2': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg3': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg4': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}}
-    dvnt.send_command_to_servos(angles, 2000)
-    time.sleep(3)
-    angles = {'leg1': {'tetta': 0.0, 'alpha': -19.47, 'beta': 88.95, 'gamma': -70.62}, 'leg2': {'tetta': 0.0, 'alpha': -19.47, 'beta': 88.95, 'gamma': -70.62}, 'leg3': {'tetta': 0.0, 'alpha': -19.47, 'beta': 88.95, 'gamma': -70.62}, 'leg4': {'tetta': 0.0, 'alpha': -19.47, 'beta': 88.95, 'gamma': -70.62}}
-    dvnt.send_command_to_servos(angles, 5000)
-    time.sleep(6)
-    angles = {'leg1': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg2': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg3': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}, 'leg4': {'tetta': 0.0, 'alpha': -53.19, 'beta': 72.44, 'gamma': -94.85}}
-    dvnt.send_command_to_servos(angles, 2000)
-    time.sleep(3)
-    dvnt.send_command_to_motors(0)
-    """
-    dvnt.wheels_direction = WheelsDirection.FORWARD
-    # 10-13-13
-    #angles = {'leg1': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}, 'leg2': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}, 'leg3': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}, 'leg4': {'tetta': 0.0, 'alpha': -72.38, 'beta': 93.02, 'gamma': -96.45}}
-    # 20-10-10
-    #angles = {'leg1': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}, 'leg2': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}, 'leg3': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}, 'leg4': {'tetta': 0.0, 'alpha': -17.05, 'beta': 108.58, 'gamma': -27.57}}
-    # 20-13-13
-    angles = {'leg1': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}, 'leg2': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}, 'leg3': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}, 'leg4': {'tetta': 0.0, 'alpha': -21.17, 'beta': 108.95, 'gamma': -15.32}}
-    dvnt.send_command_to_servos(angles, 2000)
+    angles = {
+        'leg1_tetta': 0.0, 
+        'leg1_alpha': 60.0, 
+        'leg1_beta': 90.0,
+        'leg2_tetta': 0.0, 
+        'leg2_alpha': 60.0, 
+        'leg2_beta': 90.0,
+        'leg3_tetta': 0.0, 
+        'leg3_alpha': 60.0, 
+        'leg3_beta': 90.0, 
+        'leg4_tetta': 0.0, 
+        'leg4_alpha': 60.0, 
+        'leg4_beta': 90.0,
+    }
+
+    hh_kin = HHKinematics()
+    hh_kin.body_movement(5, 0, 0)
+    print(hh_kin.sequence)
+
+    for item in hh_kin.sequence:
+        hh.set_servo_values_paced_wo_feedback(item.angles_snapshot)
     
-    time.sleep(3)
-    dvnt.send_command_to_motors(1000)
-    time.sleep(2)
-    dvnt.send_command_to_motors(0)
-
-    #dvnt.send_command_to_motors(1000)
-    #time.sleep(3)
-    #dvnt.send_command_to_motors(0)
-
     #sequence = [[0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0]]
         
     #for angles in sequence:     

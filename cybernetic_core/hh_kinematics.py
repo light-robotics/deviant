@@ -54,7 +54,10 @@ class HHKinematics:
         }
 
         self.angles_history.append(MoveSnapshot(move_type, angles))
-    
+
+    def reset_history(self):
+        self.angles_history = []
+
     @property
     def sequence(self):
         sequence = []
@@ -86,3 +89,28 @@ class HHKinematics:
         self.logger.info('[Init] Initialization successful')
 
         return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
+
+    def leg_movement(self, leg_num, leg_delta):
+        self.logger.info(f'Move. Leg {leg_num} for {leg_delta}')
+        leg = self.legs[leg_num]
+
+        leg.move_end_point(leg_delta[0], leg_delta[1], leg_delta[2])
+        self.add_angles_snapshot('endpoint')
+
+    def body_movement(self, delta_x, delta_y, delta_z, snapshot=True):
+        self.logger.info(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
+        if delta_x == delta_y == delta_z == 0:
+            return
+
+        for leg_num, leg in self.legs.items():
+            self.logger.info(f'Moving mount point for {leg_num} : {[delta_x, delta_y, delta_z]}')
+            leg.move_mount_point(delta_x, delta_y, delta_z)
+
+        if snapshot:
+            self.add_angles_snapshot('body')
+
+
+if __name__ == '__main__':
+    hh_kin = HHKinematics()
+    hh_kin.body_movement(5, 0, 0)
+    print(hh_kin.sequence)

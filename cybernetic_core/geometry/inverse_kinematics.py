@@ -56,9 +56,9 @@ def get_knee_angles(Cx, Cz):
     Cx = Bx + b * math.cos(alpha + beta)
     Cy = By + b * math.sin(alpha + beta)
 
-    print(f'alpha: {math.degrees(alpha)}')
-    print(f'beta : {math.degrees(beta)}')
-    print(f'B: {[Bx, By]}. C: {[Cx, Cy]}')
+    #print(f'alpha: {math.degrees(alpha)}')
+    #print(f'beta : {math.degrees(beta)}')
+    #print(f'B: {[Bx, By]}. C: {[Cx, Cy]}')
 
     return alpha, beta
 
